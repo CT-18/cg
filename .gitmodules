@@ -1,0 +1,3 @@
+[submodule "convex_hull_7"]
+	path = convex_hull_7
+	url = https://github.com/artemZholus/convex-hull.git
