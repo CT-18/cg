@@ -2,5 +2,5 @@
 	path = 7_convex_hull
 	url = https://github.com/artemZholus/convex-hull.git
 [submodule "vich_geom"]
-	path = 18_delanau_localization
+	path = 18_delaunay_localization
 	url = https://github.com/BioRyajenka/vich_geom
