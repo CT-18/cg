@@ -4,3 +4,6 @@
 [submodule "vich_geom"]
 	path = 18_delaunay_localization
 	url = https://github.com/BioRyajenka/vich_geom
+[submodule "11_trapezoidal_map"]
+	path = 11_trapezoidal_map
+	url = https://github.com/kohanov/trapezoidal_map.git
