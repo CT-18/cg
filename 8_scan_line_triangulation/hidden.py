@@ -32,7 +32,6 @@ class Hedge:
         self.twin = None
         self.next = None
         self.prev = None
-        self.helper = None
         
     def __lt__(self, other):
         """
@@ -77,9 +76,10 @@ def build_dcel(vert):
     return dcel
 
 def add_diagonal(hfrom, hto):
-    print ('[ADD DIAGONAL] from: {} to: {}'.format(hfrom.origin, hto.origin))
+    #print ('[ADD DIAGONAL] from: {} to: {}'.format(hfrom.origin, hto.origin))
     d = Hedge(hfrom.origin)
     d.twin = Hedge(hto.origin)
+    """
     hfrom.prev.next = d
     d.prev = hfrom.prev
     hfrom.prev = d.twin
@@ -88,5 +88,6 @@ def add_diagonal(hfrom, hto):
     d.twin.prev = hto.prev
     hto.prev = d
     d.next = hto
+    """
     return d
 

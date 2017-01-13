@@ -10,7 +10,7 @@ def natural_sort(l):
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
     return sorted(l, key = alphanum_key)
 
-def draw_points(source, types=True):
+def draw_points(source, types=False):
     def type_color(v):
         if v.vtype == 'regular':
             return 'ok'
@@ -28,6 +28,9 @@ def draw_points(source, types=True):
     if types:
         for v in source:
             plt.plot(v.x, v.y,type_color(v), zorder=1)
+    else:
+        for v in source:
+            plt.plot(v.x, v.y,'ko', zorder=1)
     plt.axis([xmin,xmax, ymin,ymax])
     plt.show()
 
