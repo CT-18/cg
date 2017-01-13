@@ -27,6 +27,9 @@ class Vertex:
 
     
 class Hedge:
+    """
+    Класс half-edge - одностороннего ребра, которое используется в DCEL.
+    """
     def __init__(self, v):
         self.origin = v
         self.twin = None
