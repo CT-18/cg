@@ -2,7 +2,7 @@ import numpy as np
 from shapely.geometry.polygon import Polygon
 from shapely.geometry import Point
 import math, random
-from sympy import Ray, Segment
+from sympy import Ray as sRay, Segment as sSegment
 from sympy import Point as sPoint
 from sympy import intersection
 from random import randint
@@ -55,9 +55,21 @@ def clip(x, min, max) :
     else :             return x
 	
 def intersect(ray, segment):
-    ray = Ray(sPoint(*ray[0]),sPoint(*ray[1]))
-    segment = Segment(segment[0],segment[1])
+    ray = sRay(sPoint(*ray[0]),sPoint(*ray[1]))
+    segment = sSegment(segment[0],segment[1])
     return len(intersection(ray,segment)) != 0
+	
+def isBetween(point1, point2, point):
+    x1 = min(point1[0], point2[0])
+    x2 = max(point1[0], point2[0])
+    y1 = min(point1[1], point2[1])
+    y2 = max(point1[1], point2[1])
+    return x1 <= point[0] and point[0] <= x2 and y1 <= point[1] and y2 <= point[1]
+
+def isOnSegment(point,segment):
+    s=sSegment(segment[0],segment[1])
+    p=sPoint(*point)
+    return len(intersection(s,p)) != 0
 	
 	
     
