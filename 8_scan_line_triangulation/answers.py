@@ -12,3 +12,9 @@ def compute_vtype_answer(v1, v2, v3):
         else:
             return 'merge'
     return 'regular'
+
+
+def different_chains_answer(h1, h2):
+    down1 = h1.origin < h1.twin.origin
+    down2 = h2.origin < h2.twin.origin
+    return down1 != down2

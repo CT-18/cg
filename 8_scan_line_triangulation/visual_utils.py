@@ -82,7 +82,7 @@ def visual_dump_triang(cur_v,D,D1,S,Q,filename):
     plt.savefig(filename)
     plt.close(fig)
     
-def SlideShower(folder, frame_duration=1000):
+def SlideShower(folder, frame_duration=800):
     slides = list([open(os.path.join(folder,s), 'rb').read()
                    for s in natural_sort(os.listdir(folder))])
 
