@@ -1,5 +1,6 @@
 import re
 import os
+import shutil
 
 import matplotlib.pyplot as plt
 import ipywidgets as widgets
@@ -35,7 +36,7 @@ def draw_points(source, types=False):
     plt.axis([xmin,xmax, ymin,ymax])
     plt.show()
 
-def visual_dump_state(cur_v, D,D1,T,Q,filename):
+def visual_dump_pieces(cur_v, D,D1,T,Q,filename):
     xmin, xmax = min([i.x for i in Q]) - 2, max([i.x for i in Q]) + 2
     ymin, ymax = min([i.y for i in Q]) - 2, max([i.y for i in Q]) + 2
     fig = plt.figure(figsize=(5,5))
@@ -82,6 +83,16 @@ def visual_dump_triang(cur_v,D,D1,S,Q,filename):
     plt.axis([xmin,xmax, ymin,ymax])
     plt.savefig(filename)
     plt.close(fig)
+    
+def create_dump_func(folder, func, *args):
+    c = 0
+    shutil.rmtree(folder, ignore_errors=True)
+    os.makedirs(folder, exist_ok=True)
+    def dump(v):
+        nonlocal c
+        func(v, *args, filename = os.path.join(folder,'{}.png'.format(c)))
+        c += 1
+    return dump
     
 def SlideShower(folder, frame_duration=800):
     slides = list([open(os.path.join(folder,s), 'rb').read()
