@@ -24,6 +24,7 @@ def draw_points(source, types=False):
             return 'vb'
     xmin, xmax = min([i.x for i in source]) - 2, max([i.x for i in source]) + 2
     ymin, ymax = min([i.y for i in source]) - 2, max([i.y for i in source]) + 2
+    plt.figure(figsize=(6,6))
     plt.plot([i.x for i in source + [source[0]]], [i.y for i in source + [source[0]]],'k-', zorder=0)
     if types:
         for v in source:
@@ -37,7 +38,7 @@ def draw_points(source, types=False):
 def visual_dump_state(cur_v, D,D1,T,Q,filename):
     xmin, xmax = min([i.x for i in Q]) - 2, max([i.x for i in Q]) + 2
     ymin, ymax = min([i.y for i in Q]) - 2, max([i.y for i in Q]) + 2
-    fig = plt.figure()
+    fig = plt.figure(figsize=(5,5))
     for h in D:
         xs = [h.origin.x, h.twin.origin.x]
         ys = [h.origin.y, h.twin.origin.y]
@@ -62,7 +63,7 @@ def visual_dump_state(cur_v, D,D1,T,Q,filename):
 def visual_dump_triang(cur_v,D,D1,S,Q,filename):
     xmin, xmax = min([i.x for i in Q]) - 2, max([i.x for i in Q]) + 2
     ymin, ymax = min([i.y for i in Q]) - 2, max([i.y for i in Q]) + 2
-    fig = plt.figure()
+    fig = plt.figure(figsize=(5,5))
     for h in D:
         xs = [h.origin.x, h.twin.origin.x]
         ys = [h.origin.y, h.twin.origin.y]
@@ -86,7 +87,7 @@ def SlideShower(folder, frame_duration=800):
     slides = list([open(os.path.join(folder,s), 'rb').read()
                    for s in natural_sort(os.listdir(folder))])
 
-    img = widgets.Image(value=slides[0],width=600,height=400)
+    img = widgets.Image(value=slides[0],width=500,height=500)
 
     def on_frame(change):
         n = change['new']
