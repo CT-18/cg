@@ -20,7 +20,7 @@ def generateTest():
 def check(points,point): 
     p = Polygon(points)
     point = Point(point)
-    return 'in' if p.contains(Point(point)) else 'out'
+    return p.contains(Point(point))
 
 
 def draw(points,point):
@@ -31,7 +31,7 @@ def draw(points,point):
     points_t = np.array(points).T
     ax1.plot(points_t[0,], points_t[1,], '--', c='r')
     ax1.scatter(points_t[0,], points_t[1,], c='r')
-    ax1.plot(points[0][0], points[0][1], 'o', color='b')
+    ax1.plot(points[0][0], points[0][1], '.', color='b')
     ax1.set_xlim(0 - 1, 25 + 1)
     ax1.set_ylim(0 - 1, 25 + 1)
     display(fig)
@@ -53,6 +53,8 @@ def test(f, n = 200):
                     continue
                 print("Test №{} failed".format(i + 1))
                 print("Expected {}, result {}".format(answer, result))
+                print("points={}".format(points))
+                print("point={}".format(point))
                 draw(points, point)
                 return
     print("All tests ok")
