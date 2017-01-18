@@ -105,5 +105,56 @@ def test(f, n = 200):
             return
     print("All tests ok")
     
+def drawSegment(ax,segment,color):
+    segment = np.array(segment).T
+    ax.plot(segment[0,], segment[1,], c=color)
+    ax.scatter(segment[0,], segment[1,],c=color)
+    
+def drawRay(ax,ray,maxX,color):
+    a = ray[0][1]-ray[1][1]
+    b = ray[1][0]-ray[0][0]
+    c = ray[0][0]*ray[1][1]-ray[1][0]*ray[0][1]
+    y=(-c-a*maxX)/b
+    ray[1]=[maxX,y]
+    drawSegment(ax,ray,color)
+    
+def testIntersect(f, n = 200):
+    for i in range(1, n):
+        if i % 50 == 0:
+            print('passed {} tests'.format(i))
+        ray = np.random.randint(0,25,size = (2,2))
+        segment = np.random.randint(0, 25, size = (2,2))
+        answer = intersect(ray, segment)
+        result = f(ray, segment)
+        if f(ray,segment) is intersect(ray, segment):
+            continue
+        fig = plt.figure(figsize = (6, 6))
+        ax1 = plt.subplot(111, aspect = 'equal')
+        drawRay(ax1,ray,27,'r')
+        drawSegment(ax1,segment,'g')
+        ax1.set_xlim(0 - 1, 25 + 1)
+        ax1.set_ylim(0 - 1, 25 + 1)
+        ax1.set_title("expected {}, result {}".format(answer,result))
+        display(fig)
+        plt.close()
+        return
+    print("All tests ok")
+   
+def showExamples(tests,f):
+    lines=len(tests)//3 + (1 if len(tests)%3 != 0 else 0)
+    f, axes = plt.subplots(lines, 3, figsize=(9, 3*lines))
+    
+    while lines*3 != len(tests) :
+        tests.insert(len(tests), [[-5, -5], [-5, -5], [-5, -5], [-5, -5]])
+        
+    for (a, b, c, d), axis in zip(tests, axes.reshape(len(tests))):
+        if a[0] == a[1] == b[0] == b[1] == c[0] == c[1] == d[0] == d[1] == -5:
+            continue
+        drawRay(axis,[a,b],4,'r')
+        drawSegment(axis,[c,d],'g')
+        axis.set_xlim(-1, 3)
+        axis.set_ylim(-1, 3)
+    plt.show()
+    plt.close()
     
     
