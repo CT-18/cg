@@ -2,7 +2,7 @@ from random import randint
 from scipy.spatial import Delaunay
 import matplotlib.pyplot as plt
 import numpy as np
-from ipywidgets import interact, IntSlider
+from ipywidgets import interact, interactive, IntSlider
 from IPython.display import display
 from random import random
 
@@ -11,7 +11,6 @@ currentLevel = None
 fig = plt.figure(figsize=(6, 6))
 ax1 = plt.subplot(111, aspect='equal')
 q, = ax1.plot([10], [10], 'o', color='yellow')
-slider = IntSlider(min=0,max=1,step=1,value=0)
 
 def generatePoints(n, N):
     points = {(randint(0, n), randint(0, n)) for i in range(N)}
@@ -100,23 +99,23 @@ def changeLevel(r = 0):
 changeLevel.suspend = True
 
 def visualize():
-    global currentLevel, levels, slider, fig, ax1, q
+    global currentLevel, levels, fig, ax1, q
     changeLevel.suspend = True
     fig.canvas.mpl_connect('button_release_event', onRelease)
-    interact(changeLevel, x=slider)
-    ax1.clear()
     
     redrawClosest.closestPoint = None
     printLevel.prevEdges = None
     printLevel.prevPoints = None
+    ax1.clear()
+	
     q, = ax1.plot([10], [10], 'o', color='yellow')
     
     points = generatePoints(20, 20)
-    levels = createLevels(points, .6)
+    levels = createLevels(points, .4)
     printLevel(fig, ax1, q, levels, 0, True) # printing gray imprint
     
-    slider.value = currentLevel = 0
-    slider.max = len(levels) - 1
+    #ax1.text(2, 2, len(levels))
     
     changeLevel.suspend = False
+    display(interactive(changeLevel, r=(0, len(levels) - 1)))
     printLevel(fig, ax1, q, levels, 0, redraw = False)
