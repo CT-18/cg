@@ -1,4 +1,6 @@
-
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.spatial import ConvexHull
 
 def example_pred(A0, A1, B0, B1) :
     return np.sign(np.linalg.det(np.array([A1 - A0,B1 - B0])))
