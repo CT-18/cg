@@ -12,7 +12,6 @@ class Segment():
 
 """Структура, описывающая трапецоид"""
 class Trapezoid():
-    
     def __init__(self, top, bottom, leftp, rightp):
         "Верхний и нижний отрезки"
         self.top = top
@@ -29,8 +28,8 @@ class Trapezoid():
         "Ссылки на узлы локализационной структуры"
         self.links = []
 
+"""Структура, описывающая узел локализационной структуры"""
 class Node():
-        
         def __init__(self, nodeType, s):
             "Тип узла: -1 для точки p, 0 для отрезка s, 1 для точки q"
             self.mytype = nodeType
@@ -44,7 +43,6 @@ class Node():
             self.right = [None, None]
 
 class TrapezoidalMap():
-    
     def __init__(self):
         "Список всех трапецоидов, для отрисовки"
         self.tr = [Trapezoid(None, None, None, None)]
