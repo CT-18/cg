@@ -1,4 +1,13 @@
+from enum import Enum
+
 import matplotlib.pyplot as plt
+
+class VType(Enum):
+    start = 1
+    split = 2
+    end = 3
+    merge = 4
+    regular = 5
 
 def turn(v1, v2, v3):
     return (v2.x - v1.x) * (v3.y - v1.y) - (v3.x - v1.x) * (v2.y - v1.y)
@@ -10,14 +19,11 @@ class Vertex:
     def __init__(self, px, py):
         self.x = px
         self.y = py
-        self.hedgelist = []
+        self.hedge = None
         self.vtype = None
     
     def __lt__(self, other):
-        d = self.y - other.y
-        if d == 0: 
-            d = other.x - self.x
-        return d > 0
+        return self.y > other.y or (self.y == other.y and self.x < other.x)
     
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
@@ -54,16 +60,14 @@ def build_dcel(vert):
     dcel = []
     start = Hedge(vert[0])
     start.twin = Hedge(vert[1])
-    vert[1].hedgelist.append(start.twin)
     start.twin.twin = start
     dcel.append(start)
     prev = start
     lis = vert[1:] + [vert[0]]
     for i in range(0, len(lis)-1):
         cur = Hedge(lis[i])
-        lis[i].hedgelist.append(cur)
+        lis[i].hedge = cur
         cur.twin = Hedge(lis[i+1])
-        lis[i+1].hedgelist.append(cur.twin)
         cur.twin.twin = cur
         cur.prev = prev
         prev.next = cur
@@ -75,11 +79,10 @@ def build_dcel(vert):
     start.prev = cur
     start.twin.next = cur.twin
     cur.twin.prev = start.twin
-    vert[0].hedgelist.append(start)
+    vert[0].hedge = start
     return dcel
 
 def add_diagonal(hfrom, hto):
-    #print ('[ADD DIAGONAL] from: {} to: {}'.format(hfrom.origin, hto.origin))
     d = Hedge(hfrom.origin)
     d.twin = Hedge(hto.origin)
     """

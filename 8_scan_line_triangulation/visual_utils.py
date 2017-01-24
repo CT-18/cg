@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import ipywidgets as widgets
 import traitlets
 
+from hidden import VType
+
 def natural_sort(l): 
     convert = lambda text: int(text) if text.isdigit() else text.lower() 
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
@@ -13,15 +15,15 @@ def natural_sort(l):
 
 def draw_points(source, types=False):
     def type_color(v):
-        if v.vtype == 'regular':
+        if v.vtype == VType.regular:
             return 'ok'
-        if v.vtype == 'start':
+        if v.vtype == VType.start:
             return 'sy'
-        if v.vtype == 'end':
+        if v.vtype == VType.end:
             return 'sg'
-        if v.vtype == 'split':
+        if v.vtype == VType.split:
             return '^r'
-        if v.vtype == 'merge':
+        if v.vtype == VType.merge:
             return 'vb'
     xmin, xmax = min([i.x for i in source]) - 2, max([i.x for i in source]) + 2
     ymin, ymax = min([i.y for i in source]) - 2, max([i.y for i in source]) + 2

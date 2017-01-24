@@ -1,17 +1,17 @@
-from hidden import turn
+from hidden import turn, VType
 
 def compute_vtype_answer(v1, v2, v3):
     if v1 > v2 and v3 > v2: # greater means below
         if turn(v1,v2,v3) > 0:
-            return 'start'
+            return VType.start
         else:
-            return 'split'
+            return VType.split
     elif v1 < v2 and v3 < v2:
         if turn(v1,v2,v3) > 0:
-            return 'end'
+            return VType.end
         else:
-            return 'merge'
-    return 'regular'
+            return VType.merge
+    return VType.regular
 
 
 def different_chains_answer(h1, h2):
