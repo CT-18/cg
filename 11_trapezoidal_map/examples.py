@@ -39,6 +39,6 @@ def localization_slideshow():
     
     images = []
     for i in range(12):
-        imageName = 'images/map/'+ str(i + 1) + '.pdf-1.jpg'
+        imageName = 'images/map/'+ str(i + 1) + '.jpg'
         images.append(imageName)
     browse_images(images)
