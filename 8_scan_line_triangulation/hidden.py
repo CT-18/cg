@@ -42,16 +42,6 @@ class Hedge:
         self.next = None
         self.prev = None
         
-    def __lt__(self, other):
-        """
-        Сравнение для дерева поиска рёбер в сканлайне 
-        """
-        v1 = self.origin
-        v2 = self.twin.origin
-        v3 = other.origin
-        t = turn(v1, v2, v3)
-        return t > 0
-        
     def __repr__(self):
         return '{}->{}'.format(self.origin, self.twin.origin)
     
