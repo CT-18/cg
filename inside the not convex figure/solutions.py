@@ -73,7 +73,7 @@ def isOnSegment(point,segment):
     p = sPoint(*point)
     return len(intersection(s,p)) != 0
     
-def draw(points,point):
+def draw(points,point,title):
     fig = plt.figure(figsize = (6, 6))
     ax1 = plt.subplot(111, aspect = 'equal')
     ax1.plot(point[0], point[1], 'o', color = 'g')
@@ -81,14 +81,16 @@ def draw(points,point):
     points_t = np.array(points).T
     ax1.plot(points_t[0,], points_t[1,], '--', c='r')
     ax1.scatter(points_t[0,], points_t[1,], c='r')
-    ax1.set_xlim(0 - 1, 25 + 1)
-    ax1.set_ylim(0 - 1, 25 + 1)
+    ax1.set_xlim(0 - 1, 30 + 1)
+    ax1.set_ylim(0 - 1, 30 + 1)
+    if (title != ""):
+        ax1.set_title(title)
     display(fig)
     plt.close()
     
 def test(f, n = 200):
     for i in range(0,n):
-        points = generateTest(10, 10, 7, 0.35, 0.2, 30)
+        points = generateTest(15, 15, 10, 0.35, 0.35, 30)
         if i % 50 == 0 and i != 0:
             print('passed {} tests'.format(i))
         for j in range(0, 200):
@@ -101,9 +103,13 @@ def test(f, n = 200):
             print("Expected {}, result {}".format(answer, result))
             print("points={}".format(points))
             print("point={}".format(point))
-            draw(points, point)
+            draw(points, point,"")
             return
     print("All tests ok")
+    
+def showTest(test,f):
+    res=f(test[0],test[1])
+    draw(test[0],test[1],"inside" if res else "outside")
     
 def drawSegment(ax,segment,color):
     segment = np.array(segment).T
@@ -140,9 +146,9 @@ def testIntersect(f, n = 200):
         return
     print("All tests ok")
    
-def showExamples(tests,f):
+def showExamples(tests, f):
     lines=len(tests)//3 + (1 if len(tests)%3 != 0 else 0)
-    f, axes = plt.subplots(lines, 3, figsize=(9, 3*lines))
+    fig, axes = plt.subplots(lines, 3, figsize=(9, 3*lines))
     
     while lines*3 != len(tests) :
         tests.insert(len(tests), [[-5, -5], [-5, -5], [-5, -5], [-5, -5]])
@@ -154,6 +160,14 @@ def showExamples(tests,f):
         drawSegment(axis,[c,d],'g')
         axis.set_xlim(-1, 3)
         axis.set_ylim(-1, 3)
+        ray=[a, b]
+        segment=[c, d]
+        if f(ray, segment):
+            title="intersect"
+        else:
+            title="not intersect"
+        
+        axis.set_title(title)
     plt.show()
     plt.close()
     
