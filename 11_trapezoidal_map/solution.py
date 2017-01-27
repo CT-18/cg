@@ -130,6 +130,8 @@ class TrapezoidalMap():
         "TODO: дописать вставку"
         self.__insertInside(s, trapezoid)
 
+
+
 "Методы для отрисовки трапецоида"
 def perp(a):
     b = empty_like(a)
@@ -171,4 +173,4 @@ def points(trapezoid):
         q1[1] = intp[1]
         intp = intersectionPoint(q3, q4, trapezoid.bottom.p, trapezoid.bottom.q)
         q4[1] = intp[1]
-    return [[q1[0], q2[0], q3[0], q4[0], q1[0]], [q1[1], q2[1], q3[1], q4[1], q1[1]]]
+    return [q1, q2, q3, q4]
