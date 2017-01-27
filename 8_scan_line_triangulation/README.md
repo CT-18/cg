@@ -11,3 +11,9 @@
 ```
 pip install -r requirements.txt
 ```
+
+А потом включить `ipywidgets`:
+
+```
+jupyter nbextension enable --py --sys-prefix widgetsnbextension
+```
