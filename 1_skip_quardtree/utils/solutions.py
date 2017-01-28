@@ -1,7 +1,11 @@
 from utils.base import *
 
+#
+# Сжатое квадродерево
+#
+
 #        
-# Локализация 
+# Локализация
 #
 
 def localize(root, point):
@@ -68,7 +72,7 @@ def combine(node, point, bounds):
             new_node.children[qt] = Node(None, None, None)
     return new_node
         
-def insertInternal(tree, point, node):
+def cqtree_insertInternal(tree, point, node):
     qt = quarter_by(node.bounds, point)
     child = node.children[qt]
     if child.simple():
@@ -95,7 +99,7 @@ def replace_with(node, other):
     node.bounds = other.bounds
     node.children = other.children        
         
-def removeInternal(tree, point, node):
+def cqtree_removeInternal(tree, point, node):
     qt = quarter_by(node.bounds, point)
     child = node.children[qt]
     if child.simple():
@@ -118,3 +122,78 @@ def removeInternal(tree, point, node):
             if become_simple:
                 del tree.ref[node.bounds]           # Обновим ref
                 replace_with(node, non_empty_child) # Удалим из дерева
+
+                
+                
+#
+# Skip-квадродерево
+#
+
+#
+# Вставка
+#
+
+def sqtree_insert(tree, point):
+    if len(tree.levels) > 0:
+        # Локализация в последнем уровне
+        level_index = len(tree.levels) - 1
+        level = tree.levels[level_index]
+        node = level.localize(point)
+        nodes = [node]
+        # Поуровневая локализация
+        while level_index != 0:
+            level_index -= 1
+            level = tree.levels[level_index]
+            # Используем результат предыдущей локализации
+            new_node = level.ref[nodes[-1].bounds]
+            nodes.append(level.localize(point, new_node))
+        nodes.reverse()
+    else:
+        nodes = []
+    
+    #Добавляем точку
+    level_index = 0
+    while True:
+        if level_index < len(tree.levels):
+            # Вставляем точку в ноду, полученную при локализации
+            node = nodes[level_index]
+            level = tree.levels[level_index]
+            level.insertInternal(point, node)
+            if rnd_bool():
+                # Переходим на уровень выше
+                level_index += 1
+            else:
+                return
+        else:
+            # Создаем новый уровень, который будет содержать только добавленную вершину
+            new_level = tree.new_level()
+            tree.levels.append(new_level)
+            new_level.insert(point)
+            return
+        
+#
+# Удаление
+#
+
+def sqtree_remove(tree, point):
+    if len(tree.levels) > 0:
+        # Локализация в последнем уровне
+        level_index = len(tree.levels) - 1
+        level = tree.levels[level_index]
+        node = level.localize(point)
+        bounds = node.bounds
+        # Удаляем точку с уровня
+        level.removeInternal(point, node)
+        # Поуровневая локализация
+        while level_index != 0:
+            level_index -= 1
+            level = tree.levels[level_index]
+            # Используя результат предыдущей локализации, делаем локализацию на текущем уровне
+            node = level.localize(point, level.ref[bounds])
+            bounds = node.bounds
+            # Удаляем точку с уровня
+            level.removeInternal(point, node)
+           
+        if tree.levels[-1].empty():
+            # Удаляем последний пустой уровень
+            del tree.levels[-1]

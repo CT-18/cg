@@ -1,4 +1,5 @@
 import enum
+import numpy.random
 
 class Quarter(enum.Enum):
     LT = 0
@@ -53,3 +54,7 @@ class Node:
     def empty(self):
         return (self.children is None) and (self.data is None)
 
+p = 0.5
+
+def rnd_bool():
+    return numpy.random.choice([False, True], p=[1-p, p])
