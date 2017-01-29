@@ -20,10 +20,10 @@ def turn(a, b, c):
 
 class Slab:
     def __init__(self, edges: list):
-		self.iter = None
+        self.iter = None
         self.edges = edges
         self.edges.sort()
-        self.fig, self.ax = plt.subplots()
+        # self.fig, self.ax = plt.subplots()
 
     @staticmethod
     def read_slab(file):
@@ -35,7 +35,7 @@ class Slab:
         fin.close()
         return Slab(edges)
 
-    def __convert(self):
+    def convert(self):
         result = list()
         for segment in self.edges:
             x1, y1 = segment[0]
@@ -43,74 +43,24 @@ class Slab:
             result.append(([x1, x2], [y1, y2]))
         return result
 
-    def draw(self, indices=None, point=None):
-        if indices is not None:
-            i, j = indices
-            if i == -1:
-                down = [[self.edges[j][0][0], self.edges[j][1] - 1], [self.edges[j][1][0], self.edges[j][1][1] - 1]]
+    def draw(self, location=None, point=None):
+        segments = self.convert()
+        for i in range(len(segments)):
+            x, y = segments[i]
+            if location is not None and i in location:
+                plt.plot(x, y, 'k-', color='red', linewidth=3)
             else:
-                down = self.edges[i]
-            if j == len(self.edges):
-                up = [[self.edges[i][0][0], self.edges[i][1] + 1], [self.edges[i][1][0], self.edges[i][1][1] + 1]]
-            else:
-                up = self.edges[j]
-            a = np.array([down[0], down[1], up[1], up[0]])
-            polygon = Polygon(a)
-            colors = plt.cm.colors.hex2color("#FF0000")
-            p = PatchCollection([polygon])
-            self.ax.add_collection(p)
-            p.set_color(colors)
-            self.ax.autoscale_view()
+                plt.plot(x, y, 'k-', color='black')
+
         if point is not None:
             plt.plot(point[0], point[1], 'o')
-
-        segments = self.__convert()
-        for x, y in segments:
-            plt.plot(x, y, 'k-')
+	    
         plt.margins(0.1)
         plt.show()
 
-    def redraw(self, indices=None, point=None):
-        self.fig.clf()
-        self.fig, self.ax = plt.subplots()
-        cib = self.fig.canvas.mpl_connect('button_release_event', on_click)
-        if indices is not None:
-            i, j = indices
-            if i == -1:
-                down = [[self.edges[j][0][0], self.edges[j][1] - 1], [self.edges[j][1][0], self.edges[j][1][1] - 1]]
-            else:
-                down = self.edges[i]
-            if j == len(self.edges):
-                up = [[self.edges[i][0][0], self.edges[i][1] + 1], [self.edges[i][1][0], self.edges[i][1][1] + 1]]
-            else:
-                up = self.edges[j]
-            a = np.array([down[0], down[1], up[1], up[0]])
-            polygon = Polygon(a)
-            colors = plt.cm.colors.hex2color("#FF0000")
-            p = PatchCollection([polygon])
-            p.set_color(colors)
-            self.ax.add_collection(p)
-            self.ax.autoscale_view()
-        if point is not None:
-            plt.plot(point[0], point[1], 'o')
 
-        segments = self.__convert()
-        for x, y in segments:
-            plt.plot(x, y, 'k-')
-        plt.margins(0.1)
-        plt.show()
-		return cib
+def convert_edge(edge):
+	x1, y1 = edge[0]
+	x2, y2 = edge[1]
+	return ([x1, x2], [y1, y2])
 
-
-slab1 = Slab.read_slab("sample01.txt")
-print(slab1.iter)
-
-# TODO: make it interactive
-# TODO: generate a good test case
-# def on_click(event):
-#    print("click", event.xdata, event.ydata)
-#    slab.redraw([0, 1], [event.xdata, event.ydata])
-
-
-#slab.fig.canvas.mpl_connect('button_release_event', on_click)
-#slab.draw()
