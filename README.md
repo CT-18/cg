@@ -1,1 +1,3 @@
-# segment_tree
+# cg
+## segment_tree
+Репозиторий со ссылками на конспекты
