@@ -1,5 +1,7 @@
 import ipywidgets as widgets
 from IPython.display import Image
+from solution import *
+import matplotlib.pyplot as plt
 
 def slideshow(folder = 'insert', period = 1500):
     images = []
@@ -12,7 +14,7 @@ def slideshow(folder = 'insert', period = 1500):
                     'Вставили q17 в Δ14',
                     'Перестроили Δ5',
                     'Перестроили Δ10',
-                    'Обновленная локализационная структура',
+                    ' ',
                     'Конец']
     else:
         n = 12
@@ -50,7 +52,7 @@ def slideshow(folder = 'insert', period = 1500):
     )
     text = widgets.Text(
         value='',
-        placeholder='Type something',
+        placeholder=comments[0],
         description='',
         disabled=True
     )
@@ -63,3 +65,37 @@ def slideshow(folder = 'insert', period = 1500):
     widgets.jslink((play, 'value'), (slider, 'value'))
     box = widgets.VBox([widget, widgets.HBox([play, slider, text])])
     return box
+
+
+tmap = None
+leftPoint = None
+def start():
+    global leftPoint, tmap
+    tmap = TrapezoidalMap()
+    leftPoint = None
+    plt.figure(num=1, figsize=(10,5), dpi=65)
+    cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
+    plt.plot([0, 0, 5, 5, 0], [0, 5, 5, 0, 0], 'g--')
+    plt.axis('off')
+    plt.margins(0.01)
+    plt.show()
+
+def OnClick(event):
+    global leftPoint, tmap
+    if not event.dblclick:
+        plt.plot(event.xdata,event.ydata,'ro')
+        if leftPoint == None:
+            leftPoint = [event.xdata, event.ydata]
+        else:
+            rightPoint = [event.xdata, event.ydata]
+            if (leftPoint[0] > rightPoint[0]):
+                leftPoint, rightPoint = rightPoint, leftPoint
+            seg = Segment(leftPoint, rightPoint)
+            tmap.insert(seg)
+            "Дорисуем последние 2 трапецоида"
+            for i in range(2):
+                data = points(tmap.tr[len(tmap.tr) - 2 - i])
+                plt.plot([data[0][0], data[1][0]], [data[0][1], data[1][1]], 'k')
+                plt.plot([data[2][0], data[3][0]], [data[2][1], data[3][1]], 'k')
+                plt.plot([seg.p[0], seg.q[0]], [seg.p[1], seg.q[1]], 'r')
+            leftPoint = None
