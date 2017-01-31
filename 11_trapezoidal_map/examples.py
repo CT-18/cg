@@ -1,6 +1,7 @@
+from solution import * # Реализация трапецоидной карты
+
 import ipywidgets as widgets
 from IPython.display import Image
-from solution import *
 import matplotlib.pyplot as plt
 
 def slideshow(folder = 'insert', period = 1500):
@@ -73,7 +74,7 @@ def start():
     global leftPoint, tmap
     tmap = TrapezoidalMap()
     leftPoint = None
-    plt.figure(num=1, figsize=(10,5), dpi=65)
+    plt.figure(num=1, figsize=(12,5), dpi=65)
     cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
     plt.plot([0, 0, 5, 5, 0], [0, 5, 5, 0, 0], 'g--')
     plt.axis('off')

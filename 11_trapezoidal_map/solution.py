@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import *
+from enum import Enum
 
 """Структура, описывающая отрезок"""
 class Segment():
@@ -28,12 +29,17 @@ class Trapezoid():
         "Ссылки на узлы локализационной структуры"
         self.links = []
 
+"""Тип узла локализационной структуры"""
+class NodeType(Enum):
+    P = -1       # -1 для точки p
+    SEGMENT = 0  #  0 для отрезка s
+    Q = 1        #  1 для точки q
+
 """Структура, описывающая узел локализационной структуры"""
 class Node():
         def __init__(self, nodeType, s):
-            "Тип узла: -1 для точки p, 0 для отрезка s, 1 для точки q"
             self.mytype = nodeType
-            "Сылка на отрезок, по которому определяется направление обхода графа"
+            "Ссылка на отрезок, по которому определяется направление обхода графа"
             self.segment = s
             "Левое и правое ребро"
             "Если оно ведет на другой узел, то в первой ячейке True"
@@ -58,14 +64,14 @@ class TrapezoidalMap():
         while True:
             toLeft = True
             "Выбираем, влево или вправо идти"
-            if node.mytype == 0:
+            if node.mytype == NodeType.SEGMENT:
                 "Проверяем, q выше или ниже отрезка"
                 turn = np.sign(np.linalg.det(np.array([node.segment.p, node.segment.q]) - q))
                 if turn == -1:
                     "Точка ниже, идем вправо"
                     toLeft = False
                 "Иначе идем влево, даже если точка на отрезке"
-            elif node.mytype == -1:
+            elif node.mytype == NodeType.P:
                 if q[0] > node.segment.p[0]:
                     toLeft = False
             else:
@@ -100,9 +106,9 @@ class TrapezoidalMap():
         down.rightnb = [None, right]
         right.leftnb = [up, down]
         "Построим новое поддерево"
-        p = Node(-1, s)
-        q = Node(1, s)
-        seg = Node(0, s)
+        p = Node(NodeType.P, s)
+        q = Node(NodeType.Q, s)
+        seg = Node(NodeType.SEGMENT, s)
         p.left = [False, parent]
         p.right = [True, q]
         q.left = [True, seg]
