@@ -70,11 +70,12 @@ def slideshow(folder = 'insert', period = 1500):
 
 tmap = None
 leftPoint = None
+figure = None
 def start():
-    global leftPoint, tmap
+    global leftPoint, tmap, figure
     tmap = TrapezoidalMap()
     leftPoint = None
-    plt.figure(num=1, figsize=(12,5), dpi=65)
+    figure = plt.figure(num=1, figsize=(12,5), dpi=65)
     cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
     plt.plot([0, 0, 5, 5, 0], [0, 5, 5, 0, 0], 'g--')
     plt.axis('off')
@@ -84,19 +85,29 @@ def start():
 def OnClick(event):
     global leftPoint, tmap
     if not event.dblclick:
-        plt.plot(event.xdata,event.ydata,'ro')
         if leftPoint == None:
             leftPoint = [event.xdata, event.ydata]
+            plt.plot(event.xdata,event.ydata,'ro')
         else:
             rightPoint = [event.xdata, event.ydata]
             if (leftPoint[0] > rightPoint[0]):
                 leftPoint, rightPoint = rightPoint, leftPoint
             seg = Segment(leftPoint, rightPoint)
             tmap.insert(seg)
-            "Дорисуем последние 2 трапецоида"
-            for i in range(2):
-                data = points(tmap.tr[len(tmap.tr) - 2 - i])
-                plt.plot([data[0][0], data[1][0]], [data[0][1], data[1][1]], 'k')
-                plt.plot([data[2][0], data[3][0]], [data[2][1], data[3][1]], 'k')
-                plt.plot([seg.p[0], seg.q[0]], [seg.p[1], seg.q[1]], 'r')
+            # Очистим карту
+            figure.clear()
+            plt.axis('off')
+            plt.margins(0.01)
+            plt.plot(leftPoint[0], leftPoint[1],'ro')
+            plt.plot(rightPoint[0], rightPoint[1],'ro')
+            plt.plot([0, 0, 5, 5, 0], [0, 5, 5, 0, 0], 'g--')
+            # Перерисуем карту
+            for segment in tmap.segments:
+                plt.plot([segment.p[0], segment.q[0]], [segment.p[1], segment.q[1]], 'r')
+            for tr in tmap.tr:
+                data = points(tr)
+                if not tr.isMostLeft():
+                    plt.plot([data[0][0], data[1][0]], [data[0][1], data[1][1]], 'k')
+                if not tr.isMostRight():
+                    plt.plot([data[2][0], data[3][0]], [data[2][1], data[3][1]], 'k')
             leftPoint = None
