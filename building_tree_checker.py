@@ -51,7 +51,9 @@ def get_node_name(node):
 
 def show_tree(gr):
     g = Graph('G', filename='tree')
-
+    import os
+    if 'out' not in os.listdir():
+        os.mkdir('out')
     for i in range(len(gr[0]) - 1):
         color = 'green1'
         if get_node_name(gr[0][i]) != get_node_name(gr[1][i]):
@@ -68,8 +70,8 @@ def show_tree(gr):
         if r < len(gr[0]):
             g.edge(str(i), str(r))
     #g.view()
-    g.render('tree')
-    IFrame("tree.pdf", width=900, height=400)
+    g.render('out/tree')
+    #IFrame("tree.pdf", width=900, height=400)
     
 def gen_problem():
     t = [new_node for i in range(n - 1)] 
