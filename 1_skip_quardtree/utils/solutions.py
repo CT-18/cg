@@ -8,7 +8,7 @@ from utils.base import *
 # Локализация
 #
 
-def localize(root, point):
+def cqtree_localize(root, point):
     # Проверка на то, что точка геометрически лежит в этом дереве
     if not contains(root.bounds, point):
         return None
@@ -124,7 +124,53 @@ def cqtree_removeInternal(tree, point, node):
                 replace_with(node, non_empty_child) # Удалим из дерева
 
                 
-                
+#
+# Структура
+#
+        
+class CQTree:
+    """Реализация сжатого квадродерева"""
+    
+    def __init__(self, bounds, localize_fun=None, insert_fun=None, remove_fun=None):
+        root_children = {}
+        self.root = Node(bounds, root_children)
+        for qt in Quarter:
+            root_children[qt] = Node(quarter_bounds(bounds, qt), None, None)
+        # Ассоциативный массив из интересных квадратов в содержащие их узлы
+        self.ref = {bounds: self.root}
+        self.localize_fun = localize_fun if localize_fun is not None else cqtree_localize
+        self.insert_fun = insert_fun if insert_fun is not None else cqtree_insertInternal
+        self.remove_fun = remove_fun if remove_fun is not None else cqtree_removeInternal
+    
+    def localize(self, point, start=None):
+        if start is None:
+            start = self.root
+        return self.localize_fun(start, point)
+    
+    def insert(self, point):
+        node = self.localize(point)
+        if node is None:
+            return
+        self.insertInternal(point, node)
+        
+    def insertInternal(self, point, node):
+        self.insert_fun(self, point, node)
+
+    def remove(self, point):
+        node = self.localize(point)
+        if node is None:
+            return
+        self.removeInternal(point, node)
+
+    def removeInternal(self, point, node):
+        self.remove_fun(self, point, node)
+    
+    def empty(self):
+        for root_child in self.root.children.values():
+            if not root_child.empty():
+                return False
+        return True
+
 #
 # Skip-квадродерево
 #
