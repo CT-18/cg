@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import sqrt
+import os
 
 
 def test_on_args(solution, author, args):
@@ -26,14 +27,6 @@ def orientation_test(solution, author):
             args = gen(dim)
             if not test_on_args(solution, author, args):
                 return
-            #points, p = gen(dim)
-            #expected = author(points, p)
-            #actual = solution(points, p)
-            #if expected != actual:
-            #    print("wrong answer")
-            #    print("points = {}, p = {}".format(points, p))
-            #    print("expected = {}, actual = {}".format(expected, actual))
-            #    return
 
     print("correct")
 
@@ -45,14 +38,6 @@ def intersection_test(solution, author):
         args = np.round(np.random.uniform(-10, 10, 8).reshape((4, 2)))
         if not test_on_args(solution, author, args):
             return
-        #a, b, c, d = np.round(np.random.uniform(-10, 10, 8).reshape((4, 2)))
-        #expected = author(a, b, c, d)
-        #actual = solution(a, b, c, d)
-        #if expected != actual:
-        #    print("wrong answer")
-        #    print("a = {}, b = {}, c = {}, d = {}".format(a, b, c, d))
-        #    print("expected = {}, actual = {}".format(expected, actual))
-        #    return
 
     print("correct")
 
@@ -85,3 +70,27 @@ def batman(plt, f):
         plt.contour(-x, y, f, [0])
 
     plt.show()
+
+
+def area_test(solution, author):
+    test_dir = "area_test"
+
+    test_files = os.listdir(test_dir)
+
+    for test_file in test_files:
+        file_path = os.path.join(test_dir, test_file)
+        f = open(file_path)
+
+        test = list(map(lambda line: tuple(map(lambda x: int(x),
+                                               line.split(' '))),
+                        f.readlines()))
+
+        expected = author(test)
+        actual = solution(test)
+        if expected != actual:
+            print("wrong answer")
+            print("expected = {}, actual = {}".format(expected, actual))
+            print("test file = {}".format(file_path))
+            return
+
+    print("correct")

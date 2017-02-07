@@ -43,7 +43,7 @@ def area(points):
     def triangle(a, b):
         return a[0] * b[1] - a[1] * b[0]
 
-    for i in range(-1, len(points) - 1):
-        result += triangle(points[i], points[i + 1])
+    for i in range(len(points)):
+        result += triangle(points[i - 1], points[i])
 
-    return result / 2
+    return abs(result / 2)
