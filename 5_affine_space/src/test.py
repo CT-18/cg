@@ -3,6 +3,61 @@ from numpy import sqrt
 import os
 
 
+def orientation_demo(plt, orientation):
+    tests = np.array([[[0, 0], [0, 2], [0, 4]],
+                      [[0, 0], [-1, 2], [0, 4]],
+                      [[0, 0], [1, 2], [0, 4]]])
+
+    f, axes = plt.subplots(1, 3, figsize=(9, 3))
+
+    for (a, p, b), axis in zip(tests, axes.reshape((3))):
+        points = [a, b]
+        point_array = np.array([a, p, b])
+        
+        axis.scatter(point_array[:,0], point_array[:,1], c='r', s=50)
+        axis.plot(point_array[:,0], point_array[:,1], c='g')
+        
+        dx = np.array([0.3, 0])
+        for i, q in zip([0, 1], points):
+            axis.annotate('points[{}]'.format(i), xy=q, xytext=q + dx)
+        axis.annotate('p', xy=p, xytext=p + dx)
+
+        axis.set_title("sign = {}".format(orientation(points, p)))
+        axis.axis([-3, 3, -1, 5])
+
+    plt.show()
+
+
+def check_polygon(plt, orientation, points, expected):
+    f, axes = plt.subplots(3, 3, figsize=(10, 10))
+
+    points_t = points.T
+    points_cycled = np.concatenate((points_t, points[0][np.newaxis].T), axis=1)
+    
+    actual = True
+
+    for axis, i in zip(axes.reshape((9)),
+                       range(9)):
+        center = points[i - 1]
+        e1 = points[i] - center
+        e2 = points[i - 2] - center
+
+        turn = orientation([points[i], points[i - 2]], center)
+        actual &= (turn == 1)
+
+        axis.scatter(points_t[0,], points_t[1,], c='r')
+        axis.plot(points_cycled[0,], points_cycled[1,], c='g')
+        centers = np.array([center, center]).T
+        directions = np.array([e1, e2]).T
+        axis.quiver(centers[0], centers[1], directions[0], directions[1],
+                    angles='xy', scale_units='xy', scale=1, width=0.02)
+        axis.set_title("i = {}, sign = {}".format(i - 1, turn))
+
+    print("expected = {}, actual = {}".format(expected, actual))
+    print("correct" if expected == actual else "wrong answer")
+    plt.show()
+
+
 def test_on_args(solution, author, args):
     expected = author(*args)
     actual = solution(*args)
@@ -29,6 +84,27 @@ def orientation_test(solution, author):
                 return
 
     print("correct")
+
+
+def intersection_demo(plt, do_intersect):
+    tests = [[[0, 0], [2, 2], [2, 0], [0, 2]],
+             [[0, 0], [2, 2], [2, 0], [1, 1]],
+             [[0, 0], [1, 1], [2, 0], [1, 1]],
+             [[0, 0], [1, 2], [2, 0], [1, 1]],
+             [[0, 0], [2, 2], [1, 1], [3, 3]],
+             [[0, 0], [1, 1], [2, 2], [3, 3]]]
+
+    f, axes = plt.subplots(2, 3, figsize=(9, 6))
+
+    for (a, b, c, d), axis in zip(tests, axes.reshape((6))):
+        ab = np.array([a, b]).T
+        cd = np.array([c, d]).T
+        for segment, color in [(ab, 'r'), (cd, 'g')]:
+            axis.scatter(segment[0,], segment[1,], c=color, s=50)
+            axis.plot(segment[0,], segment[1,], c=color)
+        axis.set_title("Intersect" if do_intersect(a, b, c, d) else "Don't intersect")
+
+    plt.show()
 
 
 def intersection_test(solution, author):
