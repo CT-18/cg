@@ -33,7 +33,13 @@ def countSteps(points, i):
 
 
 def changeStep(step = 0):
-    #ax1.clear() 
+    ax1.clear() 
+    printStep(points, 0, step, 0, 20, 0, 20)
+    p = np.array(points)
+    ax1.plot(p[:, 0], p[:, 1], 'o', color='red')
+    ax1.set_xlim(0, 20)
+    ax1.set_ylim(0, 20)
+    display(fig)
     return
 
 def generatePoints(n, N):
@@ -44,7 +50,7 @@ def generatePoints(n, N):
 
 points = generatePoints(20, 20)
 
-def printStep(points, i, stepsLeft):
+def printStep(points, i, stepsLeft, left, right, floor, ceil):
     if (len(points) == 0 or stepsLeft == -1):
         return;
     p = np.array(points)
@@ -59,19 +65,32 @@ def printStep(points, i, stepsLeft):
         else:
             B.append(p)
 
-    #print(A, mean, B, i)
-
+    if (stepsLeft == 0):
+        col = 'r'
+    else:
+        col = 'k'
+            
+    if (len(A) + len(B) >= 2):
+        if (i == 0):
+            ax1.plot([mean, mean], [floor, ceil], color=col, linestyle='-', linewidth=2)
+        else:
+            ax1.plot([left, right], [mean, mean], color=col, linestyle='-', linewidth=2)
+            
     if (len(A) <= 1 and len(B) <= 1):
         return 1
     else: 
-        PrintStep(A, (i + 1) % 2, step - 1)
-        PrintStep(B, (i + 1) % 2, step - 1)
-
+        if (i == 0):
+            printStep(A, (i + 1) % 2, stepsLeft - 1, left, mean, floor, ceil)
+            printStep(B, (i + 1) % 2, stepsLeft - 1, mean, right, floor, ceil)
+        else:
+            printStep(A, (i + 1) % 2, stepsLeft - 1, left, right, floor, mean)
+            printStep(B, (i + 1) % 2, stepsLeft - 1, left, right, mean, ceil)
+                
 def visualize():
     global points, fig, ax1 
     steps = countSteps(points, 0) 
     p = np.array(points)
     ax1.plot(p[:, 0], p[:, 1], 'o', color='red')
+    ax1.set_xlim(0, 20)
+    ax1.set_ylim(0, 20)
     display(interactive(changeStep, step=(0, steps)))
-    
-
