@@ -72,9 +72,9 @@ def printStep(points, i, stepsLeft, left, right, floor, ceil):
             
     if (len(A) + len(B) >= 2):
         if (i == 0):
-            ax1.plot([mean, mean], [floor, ceil], color=col, linestyle='-', linewidth=2)
+            ax1.plot([mean, mean], [floor, ceil], color=col, linestyle='-', linewidth=1)
         else:
-            ax1.plot([left, right], [mean, mean], color=col, linestyle='-', linewidth=2)
+            ax1.plot([left, right], [mean, mean], color=col, linestyle='-', linewidth=1)
             
     if (len(A) <= 1 and len(B) <= 1):
         return 1
