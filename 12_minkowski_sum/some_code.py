@@ -12,10 +12,17 @@ def paint_line(this_plt, A, B, color):
     this_plt.plot([A[0], B[0]], [A[1], B[1]], color)
 
 def check_pred(pred_to_check):
-    iterations = 100
-    i = 0;
+    test0 = np.array([[3, 3], [3, 4], [2, 2], [2, 1]])
+    test1 = np.array([[3, 3], [3, 4], [2, 2], [3, 2]])
+    test2 = np.array([[3, 3], [3, 4], [2, 2], [1, 2]])
+    tests = np.array([test0, test1, test2])
+    iterations = 1000
+    i = 0
     while i < iterations:
-        A0, B0, A1, B1 = np.random.uniform(1, 4, size = (4, 2))
+        if (i < 3):
+            A0, A1, B0, B1 = tests[i]
+        else:
+            A0, A1, B0, B1 = np.random.uniform(1, 4, size = (4, 2))
         if (pred_to_check(A0, A1, B0, B1) != example_pred(A0, A1, B0, B1)):
             print("Ошибка!, A0(кр), A1(жел), B0(син), B1(зел) = ")
             print(A0, A1, B0, B1)
@@ -27,6 +34,7 @@ def check_pred(pred_to_check):
             #new_plt.plot([B0[0], B1[0]],[B0[1], B1[1]], "r")
             new_plt.axis([0, 5, 0, 5])
             new_plt = fig.add_subplot(122)
+            new_plt.axis([-4, 4, -4, 4])
             A1 = A1 - A0
             B1 = B1 - B0
             B0 = B0 - B0
@@ -105,18 +113,19 @@ def check_alg(alg_to_check):
                     
         if (not np.array_equal(C1_s, C_s)):
             print("Ошибка!")
-            print("A")
+            print("A (красный)")
             print(A)
-            print("B")
+            print("B (зеленый)")
             print(B)
-            print("C у правильного  алгоритма")
+            print("C у правильного  алгоритма(синий)")
             print(C)
-            print("C у вашего алгоритма")
+            print("C у вашего алгоритма(желтый)")
             print(C1)
-            fig = plt.figure(figsize = (15, 5))
-            paint_polygon(fig, 131, A, "r", "yo", 0, 10)
-            paint_polygon(fig, 132, B, "g", "yo", 0, 10)
-            paint_polygon(fig, 133, C, "b", "yo", 0, 20) 
+            fig = plt.figure(figsize = (10, 10))
+            paint_polygon(fig, 221, A, "r", "yo", 0, 10)
+            paint_polygon(fig, 222, B, "g", "yo", 0, 10)
+            paint_polygon(fig, 223, C, "b", "yo", 0, 20)
+            paint_polygon(fig, 224, C1, "y", "ro", 0, 20) 
             plt.show()
             return
         i += 1
