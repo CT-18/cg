@@ -14,7 +14,7 @@ def orientation_demo(plt, orientation):
         points = [a, b]
         point_array = np.array([a, p, b])
         
-        axis.scatter(point_array[:,0], point_array[:,1], c='r', s=50)
+        axis.scatter(point_array[:,0], point_array[:,1], c='r', s=50, zorder=10)
         axis.plot(point_array[:,0], point_array[:,1], c='g')
         
         dx = np.array([0.3, 0])
@@ -45,12 +45,12 @@ def check_polygon(plt, orientation, points, expected):
         turn = orientation([points[i], points[i - 2]], center)
         actual &= (turn == 1)
 
-        axis.scatter(points_t[0,], points_t[1,], c='r')
+        axis.scatter(points_t[0,], points_t[1,], c='r', zorder=10)
         axis.plot(points_cycled[0,], points_cycled[1,], c='g')
         centers = np.array([center, center]).T
         directions = np.array([e1, e2]).T
         axis.quiver(centers[0], centers[1], directions[0], directions[1],
-                    angles='xy', scale_units='xy', scale=1, width=0.02)
+                    angles='xy', scale_units='xy', scale=1, width=0.02, zorder=5)
         axis.set_title("i = {}, sign = {}".format(i - 1, turn))
 
     print("expected = {}, actual = {}".format(expected, actual))
@@ -100,7 +100,7 @@ def intersection_demo(plt, do_intersect):
         ab = np.array([a, b]).T
         cd = np.array([c, d]).T
         for segment, color in [(ab, 'r'), (cd, 'g')]:
-            axis.scatter(segment[0,], segment[1,], c=color, s=50)
+            axis.scatter(segment[0,], segment[1,], c=color, s=50, zorder=10)
             axis.plot(segment[0,], segment[1,], c=color)
         axis.set_title("Intersect" if do_intersect(a, b, c, d) else "Don't intersect")
 

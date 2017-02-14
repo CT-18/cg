@@ -24,9 +24,9 @@ def convert_demo(convert, plt):
                                          [olds, news],
                                          [new_c, [0, 0]],
                                          [new_e, ([0, 1], [1, 0])]):
-        axis.scatter(points[0,], points[1,], c='r')
+        axis.scatter(points[0,], points[1,], c='r', zorder=10)
         axis.axis([-max_coord, max_coord, -max_coord, max_coord])
-        axis.quiver(c, c, e1, e2, angles='xy', scale_units='xy', scale=1)
+        axis.quiver(c, c, e1, e2, angles='xy', scale_units='xy', scale=1, zorder=20)
     plt.show()
 
 
@@ -69,11 +69,11 @@ def affine_demo(convert, plt):
                                                                      [base_other_points, new_other_points],
                                                                      [base_centers.T, new_centers],
                                                                      [base_landmarks, new_landmarks]):
-        axis.scatter(points[0,], points[1,], c='r')
-        axis.scatter(other_points[0,], other_points[1,], c='y')
-        axis.scatter(centers[0,:1], centers[1,:1], c='b', s=50)
-        axis.scatter(centers[0,1:], centers[1,1:], c='cyan', s=50)
-        axis.scatter(landmarks[0,], landmarks[1,], c='g', s=50)
+        axis.scatter(points[0,], points[1,], c='r', zorder=10)
+        axis.scatter(other_points[0,], other_points[1,], c='y', zorder=10)
+        axis.scatter(centers[0,:1], centers[1,:1], c='b', s=50, zorder=10)
+        axis.scatter(centers[0,1:], centers[1,1:], c='cyan', s=50, zorder=10)
+        axis.scatter(landmarks[0,], landmarks[1,], c='g', s=50, zorder=10)
         axis.axis([-max_coord, max_coord, -max_coord, max_coord])
         axis.set_title("Relative to {}".format(title))
     plt.show()
