@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import ipywidgets as widgets
 from IPython.display import display
 
 def point_style(actual_point, applied):
@@ -51,6 +52,10 @@ def apply_operation(tree, op):
         return tree.remove((op[1], op[2]))
     raise Exception('Unknown command')
     
+def init_tree(tree, points):
+    for point in points:
+        tree.insert(point)
+    
 def apply_operations(tree, ops):
     for op in ops:
         apply_operation(tree, op)
@@ -83,9 +88,19 @@ class TreeViewer:
         debug_cqtree(self.tree, self.ax, op, res)
         display(self.ax.figure)
 
-def display_cqtree_interactive(tree, scale=3, on_click='insert'):
+def display_cqtree_interactive(tree, scale, on_click):
     fig = plt.figure(1, figsize=(scale, scale))
     ax = plt.subplot(111)
     global viewer
     viewer = TreeViewer(tree, ax, on_click)
     debug_cqtree(tree, ax)
+    
+
+def display_cqtree_localize(tree):
+    display_cqtree_interactive(tree, 10, 'localize')
+    
+def display_cqtree_insert(tree):
+    display_cqtree_interactive(tree, 10, 'insert')
+    
+def display_cqtree_remove(tree):
+    display_cqtree_interactive(tree, 10, 'remove')
