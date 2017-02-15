@@ -39,6 +39,9 @@ def debug_cqtree(tree, axis, applied=('none'), res=None):
     debug_node(root, axis, applied, res)
     axis.set_xlim(left, right)
     axis.set_ylim(bottom, top)
+    
+def debug_sqtree(tree, axis, level_id, applied=('none'), res=None):
+    debug_cqtree(tree.levels[level_id], axis, applied, res)
 
 def apply_operation(tree, op):
     t = op[0]
@@ -69,30 +72,64 @@ def display_cqtree_dump(tree, ops, scale=3):
         debug_cqtree(tree, axis, op)
         axis.set_title("{} ({}, {})".format(*op))
 
-viewer = None
-        
-class TreeViewer:
-    
-    def __init__(self, tree, ax):
-        self.tree = tree
-        self.ax = ax
-        ax.figure.canvas.mpl_connect('button_press_event', self.press_callback)
-        
-    def press_callback(self, event):
-        x = int(round(event.xdata))
-        y = int(round(event.ydata))
-        op_type = 'localize' if event.button == 3 else 'toggle'
-        self.do_op((op_type, x, y))
-    
-    def do_op(self, op): 
-        res = apply_operation(self.tree, op)
-        self.ax.clear()
-        debug_cqtree(self.tree, self.ax, op, res)
-        display(self.ax.figure)
+_tree = None
+_ax = None
+_slider = None
 
+def cqtree_press_callback(event):
+    global _ax, _tree
+    
+    x = int(round(event.xdata))
+    y = int(round(event.ydata))
+    op_type = 'localize' if event.button == 3 else 'toggle'
+    op = (op_type, x, y)
+    
+    res = apply_operation(_tree, op)
+    
+    _ax.clear()
+    debug_cqtree(_tree, _ax, op, res)
+    display(_ax.figure)
+
+def sqtree_press_callback(event):
+    global _tree, _slider
+    
+    x = int(round(event.xdata))
+    y = int(round(event.ydata))
+    op_type = 'remove' if event.button == 3 else 'insert'
+    op = (op_type, x, y)
+    
+    res = apply_operation(_tree, op)
+    _slider.max = len(_tree.levels)
+    
+    sqtree_display(_slider.value - 1, op, res)
+    
+def sqtree_level_change(change):
+    level_id = change['new'] - 1
+    sqtree_display(level_id, ('none'), None)
+    
+def sqtree_display(level_id, op, res):
+    global _ax, _tree, _slider
+    _ax.clear()
+    debug_sqtree(_tree, _ax, level_id, op, res)
+    
 def display_cqtree_interactive(tree, scale=10):
+    global _ax, _tree
+    
+    _tree = tree
     fig = plt.figure(1, figsize=(scale, scale))
-    ax = plt.subplot(111)
-    global viewer
-    viewer = TreeViewer(tree, ax)
-    debug_cqtree(tree, ax)
+    _ax = plt.subplot(111)
+    fig.canvas.mpl_connect('button_press_event', cqtree_press_callback)
+    debug_cqtree(_tree, _ax)
+    
+def display_sqtree_interactive(tree, scale=10):
+    global _ax, _tree, _slider
+    
+    _tree = tree
+    fig = plt.figure(1, figsize=(scale, scale))
+    _ax = plt.subplot(111)
+    _slider = widgets.IntSlider(min=1,max=len(_tree.levels),description='Level: ')
+    _slider.observe(sqtree_level_change, names='value')
+    fig.canvas.mpl_connect('button_press_event', sqtree_press_callback)
+    debug_sqtree(_tree, _ax, 0) 
+    display(_slider)
+    
