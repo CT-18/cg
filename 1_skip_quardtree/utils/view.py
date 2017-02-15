@@ -78,7 +78,7 @@ class TreeViewer:
         ax.figure.canvas.mpl_connect('button_press_event', self.press_callback)
         
     def press_callback(self, event):
-        self.do_op(event.xdata, event.ydata)
+        self.do_op(int(round(event.xdata)), int(round(event.ydata)))
     
     def do_op(self, x, y): 
         op = (self.on_click, x, y)
