@@ -165,6 +165,19 @@ class CQTree:
     def removeInternal(self, point, node):
         self.remove_fun(self, point, node)
     
+    def toggle(self, point):
+        node = self.localize(point)
+        if self.exists_in(point, node):
+            self.removeInternal(point, node)
+        else:
+            self.insertInternal(point, node)
+    
+    def exists_in(self, point, node):
+        for child in node.children.values():
+            if child.simple() and child.data == point:
+                return True
+        return False
+    
     def empty(self):
         for root_child in self.root.children.values():
             if not root_child.empty():

@@ -3,7 +3,7 @@ import ipywidgets as widgets
 from IPython.display import display
 
 def point_style(actual_point, applied):
-    if applied[0] == 'insert' and actual_point[0] == applied[1] and actual_point[1] == applied[2]:
+    if (applied[0] == 'insert' or applied[0] == 'toggle') and actual_point[0] == applied[1] and actual_point[1] == applied[2]:
         return 'ro'
     else: 
         return 'bo'
@@ -49,7 +49,9 @@ def apply_operation(tree, op):
     if t == 'insert':
         return tree.insert((op[1], op[2]))
     if t == 'remove':
-        return tree.remove((op[1], op[2]))
+        return tree.remove((op[1], op[2]))    
+    if t == 'toggle':
+        return tree.toggle((op[1], op[2]))
     raise Exception('Unknown command')
     
 def init_tree(tree, points):
@@ -71,36 +73,26 @@ viewer = None
         
 class TreeViewer:
     
-    def __init__(self, tree, ax, on_click):
+    def __init__(self, tree, ax):
         self.tree = tree
         self.ax = ax
-        self.on_click = on_click
         ax.figure.canvas.mpl_connect('button_press_event', self.press_callback)
         
     def press_callback(self, event):
-        self.do_op(int(round(event.xdata)), int(round(event.ydata)))
+        x = int(round(event.xdata))
+        y = int(round(event.ydata))
+        op_type = 'localize' if event.button == 3 else 'toggle'
+        self.do_op((op_type, x, y))
     
-    def do_op(self, x, y): 
-        op = (self.on_click, x, y)
+    def do_op(self, op): 
         res = apply_operation(self.tree, op)
-        
         self.ax.clear()
         debug_cqtree(self.tree, self.ax, op, res)
         display(self.ax.figure)
 
-def display_cqtree_interactive(tree, scale, on_click):
+def display_cqtree_interactive(tree, scale=10):
     fig = plt.figure(1, figsize=(scale, scale))
     ax = plt.subplot(111)
     global viewer
-    viewer = TreeViewer(tree, ax, on_click)
+    viewer = TreeViewer(tree, ax)
     debug_cqtree(tree, ax)
-    
-
-def display_cqtree_localize(tree):
-    display_cqtree_interactive(tree, 10, 'localize')
-    
-def display_cqtree_insert(tree):
-    display_cqtree_interactive(tree, 10, 'insert')
-    
-def display_cqtree_remove(tree):
-    display_cqtree_interactive(tree, 10, 'remove')
