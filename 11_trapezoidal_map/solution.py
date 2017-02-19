@@ -1,7 +1,6 @@
 from TMapClasses import *
 
 import numpy as np
-from numpy import *
 from enum import Enum
 
 def intersectSegment(s, leftTr):
@@ -75,7 +74,7 @@ def updateRightNb(oldTr, newTr, indexes):
                 raise Exception('Error')
             oldTr.rightnb[i].leftnb[j] = newTr
 
-def insertInside(tmap, s, parent):
+def insertSegment(tmap, s, parent):
     "Метод для вставки отрезка, попавшего целиком в трапецоид"
     # Создаем 4 новых трапецоида
     up = Trapezoid(parent.top, s, s.p, s.q)
@@ -338,7 +337,7 @@ def insert(tmap, s):
         if firstTr.isMostLeft() or s.p[0] > firstTr.leftp[0] or (s.p[0] == firstTr.leftp[0] and s.p[1] > firstTr.leftp[1]):
             if firstTr.isMostRight() or s.q[0] < firstTr.rightp[0] or s.q[0] == firstTr.rightp[0] and s.q[1] < firstTr.rightp[1]:
                 # Простой случай: вставка отрезка целиком в один трапецоид
-                insertInside(tmap, s, firstTr)
+                insertSegment(tmap, s, firstTr)
                 return
         # Вставим отрезок в самый левый трапецоид
         trNodes = leftInsert(tmap, s, firstTr)

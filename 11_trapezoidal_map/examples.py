@@ -67,32 +67,33 @@ def slideshow(folder = 'insert', period = 1500):
     box = widgets.VBox([widget, widgets.HBox([play, slider, text])])
     return box
 
-
-"Методы для отрисовки трапецоида"
+#Методы для отрисовки трапецоида
 def perp(a):
-    b = empty_like(a)
+    b = np.empty_like(a)
     b[0] = -a[1]
     b[1] = a[0]
     return b
 
 def intersectionPoint(a1, a2, b1, b2):
-    a1 = array([a1[0], a1[1]])
-    a2 = array([a2[0], a2[1]])
-    b1 = array([b1[0], b1[1]])
-    b2 = array([b2[0], b2[1]])
+    """Возвращает точку пересечения отрезков"""
+    a1 = np.array([a1[0], a1[1]])
+    a2 = np.array([a2[0], a2[1]])
+    b1 = np.array([b1[0], b1[1]])
+    b2 = np.array([b2[0], b2[1]])
     da = a2-a1
     db = b2-b1
     dp = a1-b1
     dap = perp(da)
-    denom = dot( dap, db)
-    num = dot( dap, dp )
+    denom = np.dot( dap, db)
+    num = np.dot( dap, dp )
     return (num / denom.astype(float))*db + b1
 
 def points(trapezoid):
+    """Возвращает угловые точки трапецоида"""
     q1 = [0, 0]
-    q2 = [0, 5]
-    q3 = [5, 5]
-    q4 = [5, 0]
+    q2 = [0, 500]
+    q3 = [500, 500]
+    q4 = [500, 0]
     if trapezoid.leftp != None:
         q1[0] = trapezoid.leftp[0]
         q2[0] = trapezoid.leftp[0]
@@ -114,13 +115,14 @@ def points(trapezoid):
 tmap = None
 leftPoint = None
 figure = None
-def start():
+
+def interactive_example():
     global leftPoint, tmap, figure
     tmap = TrapezoidMap()
     leftPoint = None
     figure = plt.figure(num=1, figsize=(12,5), dpi=65)
     cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
-    plt.plot([0, 0, 5, 5, 0], [0, 5, 5, 0, 0], 'g--')
+    plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
     plt.axis('off')
     plt.margins(0.01)
     plt.show()
@@ -129,10 +131,10 @@ def OnClick(event):
     global leftPoint, tmap
     if not event.dblclick:
         if leftPoint == None:
-            leftPoint = [event.xdata, event.ydata]
-            plt.plot(event.xdata,event.ydata,'ro')
+            leftPoint = [int(round(event.xdata)), int(round(event.ydata))]
+            plt.plot(leftPoint[0],leftPoint[1],'ro')
         else:
-            rightPoint = [event.xdata, event.ydata]
+            rightPoint = [int(round(event.xdata)), int(round(event.ydata))]
             if (leftPoint[0] > rightPoint[0]):
                 leftPoint, rightPoint = rightPoint, leftPoint
             seg = Segment(leftPoint, rightPoint)
@@ -143,14 +145,14 @@ def OnClick(event):
             plt.margins(0.01)
             plt.plot(leftPoint[0], leftPoint[1],'ro')
             plt.plot(rightPoint[0], rightPoint[1],'ro')
-            plt.plot([0, 0, 5, 5, 0], [0, 5, 5, 0, 0], 'g--')
+            plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
             # Перерисуем карту
-            for segment in tmap.segments:
-                plt.plot([segment.p[0], segment.q[0]], [segment.p[1], segment.q[1]], 'r')
             for tr in tmap.tr:
                 data = points(tr)
                 if not tr.isMostLeft():
                     plt.plot([data[0][0], data[1][0]], [data[0][1], data[1][1]], 'k')
                 if not tr.isMostRight():
                     plt.plot([data[2][0], data[3][0]], [data[2][1], data[3][1]], 'k')
+            for segment in tmap.segments:
+                plt.plot([segment.p[0], segment.q[0]], [segment.p[1], segment.q[1]], 'r')
             leftPoint = None

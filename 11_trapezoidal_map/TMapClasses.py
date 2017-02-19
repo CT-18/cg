@@ -49,6 +49,7 @@ class AbstractNode:
         pass
 
 class XNode(AbstractNode):
+    "Узел для точки"
     
     def __init__(self, point, left, right):
         AbstractNode.__init__(self, left, right)
@@ -67,9 +68,12 @@ class XNode(AbstractNode):
                 return self.right.visit(point)
             else:
                 return self.left.visit(point) + self.right.visit(point)
+     
+    __name__ = 'XNode'
 
 
 class YNode(AbstractNode):
+    "Узел для отрезка"
     
     def __init__(self, segment, left, right):
         AbstractNode.__init__(self, left, right)
@@ -84,9 +88,12 @@ class YNode(AbstractNode):
             return self.left.visit(point)
         else: # turn == 0
             return self.left.visit(point) + self.right.visit(point)
+     
+    __name__ = 'YNode'
 
 
 class TrapezoidNode(AbstractNode):
+    "Узел для трапецоида"
     
     def __init__(self, trapezoid):
         AbstractNode.__init__(self)
@@ -98,6 +105,8 @@ class TrapezoidNode(AbstractNode):
 
     def visit(self, point):
         return [self.tr]
+
+    __name__ = 'TrapezoidNode'
 
 
 class TrapezoidMap():
