@@ -95,7 +95,31 @@ def visual_dump_triang(cur_v,D,D1,S,Q,filename):
     plt.axis([xmin,xmax, ymin,ymax])
     plt.savefig(filename)
     plt.close(fig)
+
+def visual_dump_ear_clipping_triangulation(cur_v, D, D1, S, filename):
+    xmin, xmax = min([i.origin.x for i in D]) - 2, max([i.origin.x for i in D]) + 2
+    ymin, ymax = min([i.origin.y for i in D]) - 2, max([i.origin.y for i in D]) + 2
+    fig = plt.figure(figsize=(5,5))
+    for h in D:
+        xs = [h.origin.x, h.twin.origin.x]
+        ys = [h.origin.y, h.twin.origin.y]
+        plt.plot(xs,ys,'k-')
+    for h in D1:
+        xs = [h.origin.x, h.twin.origin.x]
+        ys = [h.origin.y, h.twin.origin.y]
+        plt.plot(xs,ys,'b:')
+    for h in S:
+        xs = [h.origin.x, h.twin.origin.x]
+        ys = [h.origin.y, h.twin.origin.y]
+        plt.plot(xs,ys,'r')
+    if not cur_v is None:
+        plt.plot(cur_v.x, cur_v.y, 'yo')
+    plt.axis([xmin,xmax, ymin,ymax])
+    plt.savefig(filename)
+    plt.close(fig)
     
+    
+
 def create_dump_func(folder, func, *args):
     c = 0
     shutil.rmtree(folder, ignore_errors=True)

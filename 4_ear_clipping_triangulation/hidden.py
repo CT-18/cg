@@ -87,3 +87,25 @@ def add_diagonal(hfrom, hto):
     """
     return d
 
+def add_diagonal2(hfrom, hto):
+    d = Hedge(hfrom.origin)
+    d.twin = Hedge(hto.origin)
+    
+    hfrom.prev.next = d
+    d.prev = hfrom.prev
+    hfrom.prev.twin.pred = d.twin
+    d.twin.next = hfrom.prev.twin
+
+    hto.prev = d
+    d.next = hto
+    d.twin.prev = hto.twin
+    hto.twin.next = d.twin
+    
+    return d
+
+def add_diagonal_with_next(hfrom, hto):
+    d = Hedge(hfrom.origin)
+    d.twin = Hedge(hto.origin)
+
+    d.next = hto
+    return d
