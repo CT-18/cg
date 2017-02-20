@@ -144,7 +144,7 @@ def simple_insert_test(insert):
             if not isMapEqual(answer, check):
                 return False
             if i in [2, 6]:
-                for j in range(100):
+                for j in range(250):
                     answer = TrapezoidMap()
                     check = TrapezoidMap()
                     for pos in np.random.permutation(n):
@@ -152,4 +152,44 @@ def simple_insert_test(insert):
                         insert(check, segmentList[pos])
                     if not isMapEqual(answer, check):
                         return False
+    return True
+
+
+def nonCrossing_insert_test(insert):
+    if not simple_insert_test(insert):
+        print('Простые тесты не пройдены')
+        return False
+    with open('tests/7') as f:
+        n = int(next(f))
+        segmentList = []
+        for j in range(n):
+            px, py, qx, qy = [float(x) for x in next(f).split()]
+            segmentList.append(Segment([px, py], [qx, qy]))
+        for j in range(50):
+            answer = TrapezoidMap()
+            check = TrapezoidMap()
+            for pos in np.random.permutation(n):
+                solution.insert(answer, segmentList[pos])
+                insert(check, segmentList[pos])
+            if not isMapEqual(answer, check):
+                return False
+    return True
+
+
+def choose_test(choose):
+    with open('tests/8') as f:
+        n = int(next(f))
+        tmap = TrapezoidMap()
+        for j in range(n):
+            px, py, qx, qy = [float(x) for x in next(f).split()]
+            solution.insert(tmap, Segment([px, py], [qx, qy]))
+        n = int(next(f))
+        for j in range(n):
+            px, py, qx, qy = [float(x) for x in next(f).split()]
+            s = Segment([px, py], [qx, qy])
+            localizedList = solution.localize(tmap, s.p)
+            tr0 = solution.chooseTrapezoid(localizedList, s)
+            tr1 = choose(localizedList, s)
+            if not trapezoidEqual(tr0, tr1):
+                return False
     return True

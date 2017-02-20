@@ -233,6 +233,7 @@ def segmentInsert(tmap, s, parent, leftNb):
         updateRightNb(parent, down, [1])
     else:
         # отрезок попал в вершину, значит это последний трапецоид
+        assert parent.rightp == s.q
         up.rightnb = [parent.rightnb[0], None]
         down.rightnb = [None, parent.rightnb[1]]
         up.rightp = parent.rightp
@@ -246,7 +247,6 @@ def segmentInsert(tmap, s, parent, leftNb):
     
 def rightInsert(tmap, s, parent, leftNb):
     "Вставка отрезка в последний трапецоид"
-    # TODO: сравнить левые точки лексикографически, может и не надо создавать
     assert s.q != parent.leftp # такой трапецоид не мог тут оказаться
     # TODO: предикат поворота взять из общей библиотеки
     sign = 1 if parent.isMostRight() else np.sign(np.linalg.det(np.array([s.p, s.q]) - parent.rightp))
@@ -323,6 +323,55 @@ def rightInsert(tmap, s, parent, leftNb):
     updateNodeLinks(parent.node, qNode)
     tmap.tr.remove(parent)
     return
+
+def chooseTrapezoid(localizedList, s):
+    """Возвращает трапецоид, в котором лежит отрезок"""
+    if len(localizedList) == 1:
+        # Эта проверка для тестов, реально сюда должен приходить список с > 1 элементом
+        return localizedList[0]
+    tempList = []
+    for tr in localizedList:
+        if tr.leftp == s.p: # Не нужны трапецоиды, у которых rightp совпала с s.p
+            tempList.append(tr)
+    localizedList = tempList
+    assert len(localizedList) > 0
+    if len(localizedList) == 1:
+        # Только у одного трапецоида левая вершина совпадает с s.p
+        # Это случай на рис. 2d, причем трапецоид может быть крайним правым
+        firstTr = localizedList[0]
+        assert firstTr.leftnb[0] != None
+        assert firstTr.leftnb[1] != None
+    else:
+        # Узнаем между какимим top/bottom вставляется новый отрезок
+        # Перебираем трапецоиды, у которых leftp == s.p
+        firstTr = None
+        for tr in localizedList:
+            assert tr.leftp == s.p
+            correct = True
+            isTrCorrect = False
+            if tr.bottom != None and tr.bottom.p == s.p:
+                isTrCorrect = True
+                # TODO: предикат поворота взять из общей библиотеки
+                sign = np.sign(np.linalg.det(np.array([tr.bottom.p, tr.bottom.q]) - s.q))
+                if sign <= 0: # точка должна быть выше
+                    correct = False
+            if tr.top != None and tr.top.p == s.p:
+                isTrCorrect = True
+                # TODO: предикат поворота взять из общей библиотеки
+                sign = np.sign(np.linalg.det(np.array([tr.top.p, tr.top.q]) - s.q))
+                if sign >= 0: # точка должна быть ниже
+                    correct = False
+            if not isTrCorrect:
+                raise Exception('Error')
+            if correct:
+                if firstTr == None:
+                    # Нашли трапецоид. Он должен быть единственным
+                    firstTr = tr
+                else: 
+                    raise Exception('Error: нашли более 1 трапецоида')
+        if firstTr == None:
+            raise Exception('Error: не нашли трапецоид')
+    return firstTr
     
 def insert(tmap, s):
     "Вставка отрезка в трапецоидную карту"
@@ -346,50 +395,8 @@ def insert(tmap, s):
     else:
         # Левая вершина отрезка попала на вершину другого отерзка
         # Надо выбрать тот трапецоид, в котором пойдет новый отрезок.
-        tempList = []
-        for tr in localizedList:
-            if tr.leftp == s.p: # Не нужны трапецоиды, у которых rightp совпала с s.p
-                tempList.append(tr)
-        localizedList = tempList
-        assert len(localizedList) > 0
-        if len(localizedList) == 1:
-            # Только у одного трапецоида левая вершина совпадает с s.p
-            # Это случай на рис. 2d, причем трапецоид может быть крайним правым
-            firstTr = localizedList[0]
-            assert firstTr.leftnb[0] != None
-            assert firstTr.leftnb[0] != None
-            trNodes = firstTr.leftnb
-        else:
-            # Узнаем между какимим top/bottom вставляется новый отрезок
-            # Перебираем трапецоиды, у которых leftp == s.p
-            trNodes = None
-            for tr in localizedList:
-                assert tr.leftp == s.p
-                correct = True
-                isTrCorrect = False
-                if tr.bottom != None and tr.bottom.p == s.p:
-                    isTrCorrect = True
-                    # TODO: предикат поворота взять из общей библиотеки
-                    sign = np.sign(np.linalg.det(np.array([tr.bottom.p, tr.bottom.q]) - s.q))
-                    if sign <= 0: # точка должна быть выше
-                        correct = False
-                if tr.top != None and tr.top.p == s.p:
-                    isTrCorrect = True
-                    # TODO: предикат поворота взять из общей библиотеки
-                    sign = np.sign(np.linalg.det(np.array([tr.top.p, tr.top.q]) - s.q))
-                    if sign >= 0: # точка должна быть ниже
-                        correct = False
-                if not isTrCorrect:
-                    raise Exception('Error')
-                if correct:
-                    if firstTr == None:
-                        # Нашли трапецоид. Он должен быть единственным
-                        firstTr = tr
-                        trNodes = firstTr.leftnb
-                    else: 
-                        raise Exception('Error: нашли более 1 трапецоида')
-            if (trNodes == None):
-                raise Exception('Error: не нашли трапецоид')
+        firstTr = chooseTrapezoid(localizedList, s)
+        trNodes = firstTr.leftnb
         if not firstTr.isMostRight() and (firstTr.rightp[0] < s.q[0] or (firstTr.rightp[0] == s.q[0] and firstTr.rightp[1] < s.q[1])):
             trNodes = segmentInsert(tmap, s, firstTr, trNodes)
     # Найдем, какие трапецоиды пересекает новый отрезок
