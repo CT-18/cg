@@ -1,6 +1,7 @@
 from enum import Enum
 
-import matplotlib.pyplot as plt
+def point_comp(self, other):
+    return self.coord[1] > other.coord[1] or (self.coord[1] == other.coord[1] and self.coord[0] < other.coord[0])
 
 class VType(Enum):
     start = 1
@@ -8,29 +9,6 @@ class VType(Enum):
     end = 3
     merge = 4
     regular = 5
-
-def turn(v1, v2, v3):
-    return (v2.x - v1.x) * (v3.y - v1.y) - (v3.x - v1.x) * (v2.y - v1.y)
-
-class Vertex:
-    """
-    Класс точки с компаратором, подходящим для нашей задачи
-    """
-    def __init__(self, px, py):
-        self.x = px
-        self.y = py
-        self.hedge = None
-        self.vtype = None
-    
-    def __lt__(self, other):
-        return self.y > other.y or (self.y == other.y and self.x < other.x)
-    
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-    def __repr__(self):
-        return '({0};{1})'.format(self.x,self.y)
-
     
 class Hedge:
     """
@@ -45,8 +23,13 @@ class Hedge:
     def __repr__(self):
         return '{}->{}'.format(self.origin, self.twin.origin)
     
+def append_shorthands(points):
+    for p in points:
+        p.x = p.coord[0]
+        p.y = p.coord[1]
 
 def build_dcel(vert):
+    append_shorthands(vert)
     dcel = []
     start = Hedge(vert[0])
     start.twin = Hedge(vert[1])

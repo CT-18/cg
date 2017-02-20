@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import ipywidgets as widgets
 import traitlets
 
-from hidden import VType
+from hidden import VType, append_shorthands
 
 def natural_sort(l): 
     convert = lambda text: int(text) if text.isdigit() else text.lower() 
@@ -28,6 +28,7 @@ def _type_color(v):
             return 'vb'
 
 def draw_points(source, types=False):
+    append_shorthands(source)
     xmin, xmax = min([i.x for i in source]) - 2, max([i.x for i in source]) + 2
     ymin, ymax = min([i.y for i in source]) - 2, max([i.y for i in source]) + 2
     plt.figure(figsize=(6,6))
