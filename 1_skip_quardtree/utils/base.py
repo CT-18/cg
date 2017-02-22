@@ -54,7 +54,7 @@ class Node:
     def empty(self):
         return (self.children is None) and (self.data is None)
 
-p = 0.5
+_p = 0.5
 
 def rnd_bool():
-    return numpy.random.choice([False, True], p=[1-p, p])
+    return numpy.random.choice([False, True], p=[1 - _p, _p])
