@@ -2,35 +2,6 @@ from enum import Enum
 Type = Enum('Type', 'left right inter')
 
 
-class Point:
-    __slots__ = ("x", "y")
-
-    def __init__(self, x = 0.0, y = 0.0):
-        self.x = x
-        self.y = y
-
-    def __add__(self, p):
-        return Point(self.x + p.x, self.y + p.y)
-
-    def __sub__(self, p):
-        return Point(self.x - p.x, self.y - p.y)
-
-    def __neg__(self):
-        return Point(-self.x, -self.y)
-
-    def __lt__(self, p):
-        return self.x < p.x or self.x == p.x and self.y < p.y
-
-    def __eq__(self, p):
-        return self.x == p.x and self.y == p.y
-
-    def __gt__(self, p):
-        return not (self < p or self == p)
-
-    def __repr__(self):
-        return "(%r, %r)" % (self.x, self.y)
-
-
 class Segment:
     __slots__ = ("a", "b", "id")
 
@@ -73,6 +44,8 @@ class Event:
     def __init__(self, segment, t, addit_segment = None, inter_point = None):
         self.segment = segment
         self.t = t
+        self.addit_segment = addit_segment
+        self.inter_point = inter_point
 
     def __lt__(self, e):
         a = self.segment.a if self.t == Type.left else \
@@ -88,7 +61,10 @@ class Event:
         return a < b
 
     def __eq__(self, e):
-        return self.segment.id == e.segment.id and self.t == e.t
+        return self.t == e.t and \
+               self.segment.id == e.segment.id and \
+               (self.addit_segment is None and e.addit_segment is None or 
+                self.addit_segment is not None and e.addit_segment is None and self.addit_segment == e.addit_segment)
 
     def __gt__(self, e):
         return not (self == e or self < e)

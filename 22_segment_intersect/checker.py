@@ -1,5 +1,7 @@
 from fractions import *
 import numpy as np
+from cg import Point
+from entities import Segment
 
 import exercise_1_tests
 import Bentley_Ottmann_tests
@@ -58,3 +60,23 @@ def check_first_exercise(plt, get_intersection_point):
             print("\tYour answer:", output)
 
     plt.show()
+
+
+def check_Bentley_Ottmann_algorithm(plt, find_intersections):
+    test = Bentley_Ottmann_tests.test
+
+    f, axes = plt.subplots(2, 3, figsize=(10, 6))
+    for i, axis in zip(range(1, 7), axes.reshape(6)):
+        axis.set_title("Test " + str(i))
+        input = test(i)
+        n = input[0]  # number of segments
+        segments = []
+        for j in range(0, n):
+            x1, y1, x2, y2 = map(int, input[1][j].split())
+            s = Segment(Point(x1, y1), Point(x2, y2), j)
+            segments.append(s)
+            axis.plot([x1, x2], [y1, y2], c='black')
+            axis.scatter(x1, y1, c='black', s=30)
+            axis.scatter(x2, y2, c='black', s=30)
+        intersection_points = find_intersections(segments)
+        # TODO: how to create noninteger point?
