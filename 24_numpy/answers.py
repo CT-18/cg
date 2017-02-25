@@ -9,6 +9,12 @@ def task1_ans():
 
     return angles[fs.argmax()]
 
+def check_task1(task1):
+    if task1() == task1_ans():
+        print("Great work")
+    else:
+        print("You are so stupid, try again")
+
 def task2_ans(img, t):
     new_img = img.copy()
     near_zero = new_img < t
@@ -45,6 +51,8 @@ def test_task2(task2):
     img2.reshape((20, 50))
     t2 = 340
 
-    return test_task2_impl(img, t, task2) and test_task2_impl(img2, t2, task2)
-
+    if test_task2_impl(img, t, task2) and test_task2_impl(img2, t2, task2):
+        print("Oh yes man!")
+    else:
+        print("Are you kidding me? - It's very simple!")
 
