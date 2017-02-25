@@ -1,91 +1,91 @@
 from TMapClasses import *
 
 import numpy as np
+from cg import Point  # , turn
 from enum import Enum
 
-def intersectSegment(s, leftTr):
-    "Возвращает список трапецоидов, которые пересекает отрезок"
-    while not leftTr.isMostRight():
-        # Поиск остановится, если у трапецоида отсутствует правый вертикальный отрезок или нету соседей.
-        # TODO: лексикографическое сравнение точек взять из общей библиотеки
-        if s.q[0] < leftTr.rightp[0]:
+
+# Убрать после фикса cg_common/issues/10
+def turn(q, x, y):
+    return np.sign(
+        np.linalg.det(np.array([[x.coord[0], x.coord[1]], [y.coord[0], y.coord[1]]]) - [q.coord[0], q.coord[1]]))
+
+
+def intersect_segment(s: Segment, left_tr: Trapezoid):
+    """Возвращает список трапецоидов, которые пересекает отрезок"""
+    while not left_tr.is_rightmost():
+        # Поиск остановится, если у трапецоида нет соседей справа или конец отрезка внутри трапецоида.
+        if s.q.__lt__(left_tr.rightp) or s.q.__eq__(left_tr.rightp):
             break
-        elif s.q[0] == leftTr.rightp[0]:
-            if s.q[1] <= leftTr.rightp[1]:
-                break
-            else:
-                leftTr = leftTr.rightnb[0]
-                assert leftTr != None
-                yield leftTr
         else:
-            # Иначе считаем поворот точки rightp относительно прямой s
-            # TODO: предикат поворота взять из общей библиотеки
-            sign = np.sign(np.linalg.det(np.array([s.p, s.q]) - leftTr.rightp))
+            # Надо понять, в какого соседа пойдет отрезок. Считаем поворот rightp относительно прямой s
+            sign = turn(left_tr.rightp, s.p, s.q)
             if sign == 1:
                 # Отрезок пересекает нижнего соседа
-                leftTr = leftTr.rightnb[1]
+                left_tr = left_tr.rightnb[1]
             elif sign == -1:
                 # Отрезок пересекает верхнего соседа
-                leftTr = leftTr.rightnb[0]
-            else: #sign == 0
-                # Отрезок касается вершины, по y-координате ясно, вниз или вверх пойдёт отрезок
-                leftTr = leftTr.rightnb[0 if (s.q[1] < s.p[1]) else 1]
-            assert leftTr != None
-            yield leftTr
+                left_tr = left_tr.rightnb[0]
+            else:  # sign == 0
+                # Отрезок касается вершины внутренней точкой, такой отрезок не подходит под условие!
+                raise Exception('Error')
+            assert left_tr is not None
+            yield left_tr
 
 
-def localize(tmap, q):
-    "Возвращает список трапецоидов, в которые попала точка"
-    return tmap.root.visit(q)
+def localize(tmap: TrapezoidMap, s: Segment):
+    """Возвращает список трапецоидов, в которые попала точка"""
+    return tmap.root.visit(s)
 
-def updateNodeLinks(oldNode, newNode):
-    "Подвешиваем новый узел в дерево вместо старого"
-    for parent in oldNode.links:
-        if parent.left == oldNode:
-            parent.left = newNode
-        elif parent.right == oldNode:
-            parent.right = newNode
+
+def update_node_links(old_node, new_node):
+    # Подвешиваем новый узел в дерево вместо старого
+    for parent in old_node.links:
+        if parent.left == old_node:
+            parent.left = new_node
+        elif parent.right == old_node:
+            parent.right = new_node
         else:
             raise Exception('Error')
 
-def updateLeftNb(oldTr, newTr, indexes):
-    "Обновим левых соседей у трапецоида"
+
+def update_left_nb(old_tr, new_tr, indexes):
+    # Обновим левых соседей у трапецоида
     for i in indexes:
-        if oldTr.leftnb[i] != None:
+        if old_tr.leftnb[i] is not None:
             # Трапецоиды могут быть соседними только по 1 ссылке, проверяем это
-            if oldTr.leftnb[i].rightnb[0] == oldTr:
+            if old_tr.leftnb[i].rightnb[0] == old_tr:
                 j = 0
-            elif oldTr.leftnb[i].rightnb[1] == oldTr:
+            elif old_tr.leftnb[i].rightnb[1] == old_tr:
                 j = 1
             else:
                 raise Exception('Error')
-            oldTr.leftnb[i].rightnb[j] = newTr
+            old_tr.leftnb[i].rightnb[j] = new_tr
 
-def updateRightNb(oldTr, newTr, indexes):
-    "Обновим правых соседей у трапецоида"
+
+def update_right_nb(old_tr, new_tr, indexes):
+    # Обновим правых соседей у трапецоида
     for i in indexes:
-        if oldTr.rightnb[i] != None:
+        if old_tr.rightnb[i] is not None:
             # Трапецоиды могут быть соседними только по 1 ссылке, проверяем это
-            if oldTr.rightnb[i].leftnb[0] == oldTr:
+            if old_tr.rightnb[i].leftnb[0] == old_tr:
                 j = 0
-            elif oldTr.rightnb[i].leftnb[1] == oldTr:
+            elif old_tr.rightnb[i].leftnb[1] == old_tr:
                 j = 1
             else:
                 raise Exception('Error')
-            oldTr.rightnb[i].leftnb[j] = newTr
+            old_tr.rightnb[i].leftnb[j] = new_tr
 
-def insertSegment(tmap, s, parent):
-    "Метод для вставки отрезка, попавшего целиком в трапецоид"
+
+def insert_segment(tmap: TrapezoidMap, s, parent):
+    """Метод для вставки отрезка, попавшего целиком в трапецоид"""
     # Создаем 4 новых трапецоида
     up = Trapezoid(parent.top, s, s.p, s.q)
     down = Trapezoid(s, parent.bottom, s.p, s.q)
     left = Trapezoid(parent.top, parent.bottom, parent.leftp, s.p)
     right = Trapezoid(parent.top, parent.bottom, s.q, parent.rightp)
     # Запоминаем их
-    tmap.tr.append(up)
-    tmap.tr.append(down)
-    tmap.tr.append(left)
-    tmap.tr.append(right)
+    tmap.tr += [up, down, left, right]
     # Расставляем соседей
     up.leftnb = [left, None]
     up.rightnb = [right, None]
@@ -95,320 +95,262 @@ def insertSegment(tmap, s, parent):
     left.rightnb = [up, down]
     right.rightnb = parent.rightnb
     right.leftnb = [up, down]
-    #У соседей parent-a теперь новые трапецоиды
-    updateLeftNb(parent, left, [0, 1])
-    updateRightNb(parent, right, [0, 1])
+    # У соседей parent-a теперь новые трапецоиды
+    update_left_nb(parent, left, [0, 1])
+    update_right_nb(parent, right, [0, 1])
     # Строим новое поддерево"
-    upNode = TrapezoidNode(up)
-    downNode = TrapezoidNode(down)
-    leftNode = TrapezoidNode(left)
-    rightNode = TrapezoidNode(right)
-    segmentNode = YNode(s, upNode, downNode)
-    qNode = XNode(s.q, segmentNode, rightNode)
-    pNode = XNode(s.p, leftNode, qNode)
+    up_node = TrapezoidNode(up)
+    down_node = TrapezoidNode(down)
+    left_node = TrapezoidNode(left)
+    right_node = TrapezoidNode(right)
+    segment_node = YNode(s, up_node, down_node)
+    q_node = XNode(s.q, segment_node, right_node)
+    p_node = XNode(s.p, left_node, q_node)
     # Обновим ссылки между узлами и трапецоидами
-    upNode.links.append(segmentNode)
-    downNode.links.append(segmentNode)
-    leftNode.links.append(pNode)
-    rightNode.links.append(qNode)
-    updateNodeLinks(parent.node, pNode)
+    up_node.links.append(segment_node)
+    down_node.links.append(segment_node)
+    left_node.links.append(p_node)
+    right_node.links.append(q_node)
+    update_node_links(parent.node, p_node)
     # Удалим старый трапецоид
     tmap.tr.remove(parent)
     # Обновим корень, если это первое добавление
-    if type(tmap.root) == type(upNode):
-        tmap.root = pNode
-    
-def leftInsert(tmap, s, parent):
-    "Метод для вставки отрезка в самый левый трапецоид. Отрезок пересекает как минимум 2 трапецоида!"
-    # TODO: сравнить левые точки лексикографически, может и не надо создавать
-    assert s.p != parent.rightp # отрезок не должен был попасть в этот трапецоид
+    if type(tmap.root) == type(up_node):
+        tmap.root = p_node
+
+
+def left_insert(tmap, s, parent):
+    """Метод для вставки отрезка в самый левый трапецоид. Отрезок пересекает как минимум 2 трапецоида"""
+    assert not s.p.__eq__(parent.rightp)  # отрезок не должен был попасть в этот трапецоид
     up = Trapezoid(parent.top, s, s.p, parent.rightp)
-    down = Trapezoid(s, parent.bottom, s.p, parent.rightp) # одна из rightp ещё не известна
+    down = Trapezoid(s, parent.bottom, s.p, parent.rightp)  # одна из rightp ещё не известна
     left = Trapezoid(parent.top, parent.bottom, parent.leftp, s.p)
-    tmap.tr.append(up)
-    tmap.tr.append(down)
-    tmap.tr.append(left)
+    tmap.tr += [up, down, left]
     up.leftnb = [left, None]
     down.leftnb = [None, left]
     left.leftnb = parent.leftnb
     left.rightnb = [up, down]
-    updateLeftNb(parent, left, [0, 1])
-    # TODO: предикат поворота взять из общей библиотеки
-    sign = np.sign(np.linalg.det(np.array([s.p, s.q]) - parent.rightp))
+    update_left_nb(parent, left, [0, 1])
+    sign = turn(parent.rightp, s.p, s.q)
     if sign == 1:
         # точка выше отрезка, нижний трапецоид не закончен
         down.rightp = None
-        up.rightnb = [parent.rightnb[0], None] # нижний не известен
-        updateRightNb(parent, up, [0])
+        up.rightnb = [parent.rightnb[0], None]  # нижний не известен
+        update_right_nb(parent, up, [0])
     elif sign == -1:
         # точка ниже отрезка, верхний трапецоид не закончен
         up.rightp = None
         down.rightnb = [None, parent.rightnb[1]]
-        updateRightNb(parent, down, [1])
+        update_right_nb(parent, down, [1])
     else:
         # отрезок попал в rightp
-        assert parent.rightp == s.q
+        assert parent.rightp.__eq__(s.q)
         up.rightnb = [parent.rightnb[0], None]
         down.rightnb = [None, parent.rightnb[1]]
-        if parent.rightnb[0] != None:
+        if parent.rightnb[0] is not None:
             assert parent.rightnb[0].leftnb[0] == parent
             parent.rightnb[0].leftnb[0] = up
-        if parent.rightnb[1] != None:
+        if parent.rightnb[1] is not None:
             assert parent.rightnb[1].leftnb[1] == parent
             parent.rightnb[1].leftnb[1] = down
     # Строим новое поддерево
-    upNode = TrapezoidNode(up)
-    downNode = TrapezoidNode(down)
-    leftNode = TrapezoidNode(left)
-    segmentNode = YNode(s, upNode, downNode)
-    pNode = XNode(s.p, leftNode, segmentNode)
+    up_node = TrapezoidNode(up)
+    down_node = TrapezoidNode(down)
+    left_node = TrapezoidNode(left)
+    segment_node = YNode(s, up_node, down_node)
+    p_node = XNode(s.p, left_node, segment_node)
     # Обновим ссылки между узлами и трапецоидами
-    upNode.links.append(segmentNode)
-    downNode.links.append(segmentNode)
-    leftNode.links.append(pNode)
-    updateNodeLinks(parent.node, pNode)
+    up_node.links.append(segment_node)
+    down_node.links.append(segment_node)
+    left_node.links.append(p_node)
+    update_node_links(parent.node, p_node)
     tmap.tr.remove(parent)
-    return [up, down] # будем возвращать сначала верхний, а затем нижний
-    
-def segmentInsert(tmap, s, parent, leftNb):
-    "Вставка отрезка в очередной трапецоид, возможно последний"
+    return [up, down]  # будем возвращать сначала верхний, а затем нижний
+
+
+def segment_insert(tmap, s, parent, left_tr):
+    """Вставка отрезка в очередной трапецоид, возможно последний"""
     # Либо верхний, либо нижний трапецоид недоделан, либо начало отрезка совпало с точкой другого отрезка
     # Определим это по левым соседям трапецоида
-    if leftNb[0] != None and leftNb[0].rightp == None:
-        assert parent.leftp == leftNb[1].rightp, str(parent.leftp) + str(leftNb[1].rightp)
+    if left_tr[0] is not None and left_tr[0].rightp is None:
+        assert left_tr[1].rightp is not None and parent.leftp.__eq__(left_tr[1].rightp)
         # новый трапецоид - нижний; верхний недоделан
-        up = leftNb[0]
+        up = left_tr[0]
         down = Trapezoid(s, parent.bottom, parent.leftp, parent.rightp)
-        tmap.tr.append(down)
-        leftNb[1].rightnb[0] = down
-        down.leftnb = [leftNb[1], parent.leftnb[1]]
-        updateLeftNb(parent, down, [1])
-        upNode = up.node
-        downNode = TrapezoidNode(down)
-    elif leftNb[1] != None and leftNb[1].rightp == None:
-        assert parent.leftp == leftNb[0].rightp, str(parent.leftp) + str(leftNb[0].rightp)
+        tmap.tr += [down]
+        left_tr[1].rightnb[0] = down
+        down.leftnb = [left_tr[1], parent.leftnb[1]]
+        update_left_nb(parent, down, [1])
+        up_node = up.node
+        down_node = TrapezoidNode(down)
+    elif left_tr[1] is not None and left_tr[1].rightp is None:
+        assert left_tr[0].rightp is not None and parent.leftp.__eq__(left_tr[0].rightp)
         # новый трапецоид - верхний, а нижний недоделан
-        down = leftNb[1]
+        down = left_tr[1]
         up = Trapezoid(parent.top, s, parent.leftp, parent.rightp)
-        tmap.tr.append(up)
-        leftNb[0].rightnb[1] = up
-        up.leftnb = [parent.leftnb[0], leftNb[0]]
-        updateLeftNb(parent, up, [0])
-        upNode = TrapezoidNode(up)
-        downNode = down.node
+        tmap.tr += [up]
+        left_tr[0].rightnb[1] = up
+        up.leftnb = [parent.leftnb[0], left_tr[0]]
+        update_left_nb(parent, up, [0])
+        up_node = TrapezoidNode(up)
+        down_node = down.node
     else:
         # s.p совпадает с leftp
-        assert parent.leftp == s.p
+        assert parent.leftp.__eq__(s.p)
         up = Trapezoid(parent.top, s, parent.leftp, parent.rightp)
         down = Trapezoid(s, parent.bottom, parent.leftp, parent.rightp)
-        tmap.tr.append(up)
-        tmap.tr.append(down)
-        if parent.leftnb[0] != None:
+        tmap.tr += [up, down]
+        if parent.leftnb[0] is not None:
             up.leftnb = [parent.leftnb[0], None]
-            updateLeftNb(parent, up, [0])
+            update_left_nb(parent, up, [0])
         else:
             up.leftnb = [None, None]
-        if parent.leftnb[1] != None:
+        if parent.leftnb[1] is not None:
             down.leftnb = [None, parent.leftnb[1]]
-            updateLeftNb(parent, down, [1])
+            update_left_nb(parent, down, [1])
         else:
             down.leftnb = [None, None]
-        upNode = TrapezoidNode(up)
-        downNode = TrapezoidNode(down)
+        up_node = TrapezoidNode(up)
+        down_node = TrapezoidNode(down)
     # Надо понять, верхний или нижний трапецоид продлевать
-    # TODO: предикат поворота взять из общей библиотеки
-    assert (not parent.isMostRight()) # не должны здесь оказаться
-    sign = np.sign(np.linalg.det(np.array([s.p, s.q]) - parent.rightp))
+    assert not parent.is_rightmost()  # не должны здесь оказаться
+    sign = turn(parent.rightp, s.p, s.q)
     if sign == 1:
         # точка выше отрезка, нижний трапецоид не закончен
         down.rightp = None
-        up.rightp = parent.rightp # если в прошлый раз не закончили его
+        up.rightp = parent.rightp  # если в прошлый раз не закончили его
         up.rightnb = [parent.rightnb[0], None]
-        updateRightNb(parent, up, [0])
+        update_right_nb(parent, up, [0])
     elif sign == -1:
         # точка ниже отрезка, верхний трапецоид не закончен
         up.rightp = None
-        down.rightp = parent.rightp # если в прошлый раз не закончили его
+        down.rightp = parent.rightp  # если в прошлый раз не закончили его
         down.rightnb = [None, parent.rightnb[1]]
-        updateRightNb(parent, down, [1])
+        update_right_nb(parent, down, [1])
     else:
         # отрезок попал в вершину, значит это последний трапецоид
-        assert parent.rightp == s.q
+        assert parent.rightp.__eq__(s.q)
         up.rightnb = [parent.rightnb[0], None]
         down.rightnb = [None, parent.rightnb[1]]
         up.rightp = parent.rightp
         down.rightp = parent.rightp
-    segmentNode = YNode(s, upNode, downNode)
-    upNode.links.append(segmentNode)
-    downNode.links.append(segmentNode)
-    updateNodeLinks(parent.node, segmentNode)
+    segment_node = YNode(s, up_node, down_node)
+    up_node.links.append(segment_node)
+    down_node.links.append(segment_node)
+    update_node_links(parent.node, segment_node)
     tmap.tr.remove(parent)
     return [up, down]
-    
-def rightInsert(tmap, s, parent, leftNb):
-    "Вставка отрезка в последний трапецоид"
-    assert s.q != parent.leftp # такой трапецоид не мог тут оказаться
-    # TODO: предикат поворота взять из общей библиотеки
-    sign = 1 if parent.isMostRight() else np.sign(np.linalg.det(np.array([s.p, s.q]) - parent.rightp))
-    if sign == 0:
+
+
+def right_insert(tmap, s, parent, left_tr):
+    """Вставка отрезка в последний трапецоид"""
+    assert not s.q.__eq__(parent.leftp)  # такой трапецоид не мог тут оказаться
+    if (not parent.is_rightmost()) and s.q.__eq__(parent.rightp):
         # правый конец отрезка попал в rightp
         # значит это последний трапецоид, новые создавать не надо
-        assert s.q == parent.rightp
-        leftNb = segmentInsert(tmap, s, parent, leftNb)
-        if parent.rightnb[0] != None:
+        left_tr = segment_insert(tmap, s, parent, left_tr)
+        if parent.rightnb[0] is not None:
             assert parent.rightnb[0].leftnb[0] == parent
-            parent.rightnb[0].leftnb[0] = leftNb[0]
-        if parent.rightnb[1] != None:
+            parent.rightnb[0].leftnb[0] = left_tr[0]
+        if parent.rightnb[1] is not None:
             assert parent.rightnb[1].leftnb[1] == parent
-            parent.rightnb[1].leftnb[1] = leftNb[1]
+            parent.rightnb[1].leftnb[1] = left_tr[1]
         return
-    if leftNb[0] != None and leftNb[0].rightp == None:
-        assert parent.leftp == leftNb[1].rightp, str(parent.leftp) + str(leftNb[1].rightp)
+    if left_tr[0] is not None and left_tr[0].rightp is None:
+        assert parent.leftp.__eq__(left_tr[1].rightp)
         # новый трапецоид - нижний; верхний продолжается
-        up = leftNb[0]
+        up = left_tr[0]
         up.rightp = s.q
         down = Trapezoid(s, parent.bottom, parent.leftp, s.q)
-        tmap.tr.append(down)
-        leftNb[1].rightnb[0] = down
-        down.leftnb = [leftNb[1], parent.leftnb[1]]
-        updateLeftNb(parent, down, [1])
-        upNode = up.node
-        downNode = TrapezoidNode(down)
-    elif leftNb[1] != None and leftNb[1].rightp == None:
-        assert parent.leftp == leftNb[0].rightp, str(parent.leftp) + str(leftNb[0].rightp)
+        tmap.tr += [down]
+        left_tr[1].rightnb[0] = down
+        down.leftnb = [left_tr[1], parent.leftnb[1]]
+        update_left_nb(parent, down, [1])
+        up_node = up.node
+        down_node = TrapezoidNode(down)
+    elif left_tr[1] is not None and left_tr[1].rightp is None:
+        assert parent.leftp.__eq__(left_tr[0].rightp)
         # новый трапецоид - верхний, а нижний продолжается
-        down = leftNb[1]
+        down = left_tr[1]
         down.rightp = s.q
         up = Trapezoid(parent.top, s, parent.leftp, s.q)
-        tmap.tr.append(up)
-        leftNb[0].rightnb[1] = up
-        up.leftnb = [parent.leftnb[0], leftNb[0]]
-        updateLeftNb(parent, up, [0])
-        upNode = TrapezoidNode(up)
-        downNode = down.node
+        tmap.tr += [up]
+        left_tr[0].rightnb[1] = up
+        up.leftnb = [parent.leftnb[0], left_tr[0]]
+        update_left_nb(parent, up, [0])
+        up_node = TrapezoidNode(up)
+        down_node = down.node
     else:
         # Отрезок целиком попал в трапецоид, его левая точка совпала с leftp, а правая с rightp нет
-        assert s.p == parent.leftp
-        assert s.q != parent.rightp
+        assert s.p.__eq__(parent.leftp)
+        assert parent.is_rightmost() or not s.q.__eq__(parent.rightp)
         for i in range(2):
-            if parent.leftnb[i] != None:
-                assert leftNb[i] == parent.leftnb[i]
+            if parent.leftnb[i] is not None:
+                assert left_tr[i] == parent.leftnb[i]
         up = Trapezoid(parent.top, s, parent.leftp, s.q)
         down = Trapezoid(s, parent.bottom, parent.leftp, s.q)
-        tmap.tr.append(up)
-        tmap.tr.append(down)
-        up.leftnb = [leftNb[0], None]
-        down.leftnb = [None, leftNb[1]]
-        if leftNb[0] != None:
-            leftNb[0].rightnb[0] = up
-        if leftNb[1] != None:
-            leftNb[1].rightnb[1] = down
-        upNode = TrapezoidNode(up)
-        downNode = TrapezoidNode(down)
+        tmap.tr += [up, down]
+        up.leftnb = [left_tr[0], None]
+        down.leftnb = [None, left_tr[1]]
+        if left_tr[0] is not None:
+            left_tr[0].rightnb[0] = up
+        if left_tr[1] is not None:
+            left_tr[1].rightnb[1] = down
+        up_node = TrapezoidNode(up)
+        down_node = TrapezoidNode(down)
     right = Trapezoid(parent.top, parent.bottom, s.q, parent.rightp)
-    tmap.tr.append(right)
+    tmap.tr += [right]
     right.leftnb = [up, down]
     up.rightnb = [right, None]
     down.rightnb = [None, right]
     right.rightnb = parent.rightnb
-    updateRightNb(parent, right, [0, 1])
+    update_right_nb(parent, right, [0, 1])
     # Строим новое поддерево
-    rightNode = TrapezoidNode(right)
-    segmentNode = YNode(s, upNode, downNode)
-    qNode = XNode(s.q, segmentNode, rightNode)
+    right_node = TrapezoidNode(right)
+    segment_node = YNode(s, up_node, down_node)
+    q_node = XNode(s.q, segment_node, right_node)
     # Обновим ссылки между узлами и трапецоидами
-    upNode.links.append(segmentNode)
-    downNode.links.append(segmentNode)
-    rightNode.links.append(qNode)
-    updateNodeLinks(parent.node, qNode)
+    up_node.links.append(segment_node)
+    down_node.links.append(segment_node)
+    right_node.links.append(q_node)
+    update_node_links(parent.node, q_node)
     tmap.tr.remove(parent)
     return
 
-def chooseTrapezoid(localizedList, s):
-    """Возвращает трапецоид, в котором лежит отрезок"""
-    if len(localizedList) == 1:
-        # Эта проверка для тестов, реально сюда должен приходить список с > 1 элементом
-        return localizedList[0]
-    tempList = []
-    for tr in localizedList:
-        if tr.leftp == s.p: # Не нужны трапецоиды, у которых rightp совпала с s.p
-            tempList.append(tr)
-    localizedList = tempList
-    assert len(localizedList) > 0
-    if len(localizedList) == 1:
-        # Только у одного трапецоида левая вершина совпадает с s.p
-        # Это случай на рис. 2d, причем трапецоид может быть крайним правым
-        firstTr = localizedList[0]
-        assert firstTr.leftnb[0] != None
-        assert firstTr.leftnb[1] != None
-    else:
-        # Узнаем между какимим top/bottom вставляется новый отрезок
-        # Перебираем трапецоиды, у которых leftp == s.p
-        firstTr = None
-        for tr in localizedList:
-            assert tr.leftp == s.p
-            correct = True
-            isTrCorrect = False
-            if tr.bottom != None and tr.bottom.p == s.p:
-                isTrCorrect = True
-                # TODO: предикат поворота взять из общей библиотеки
-                sign = np.sign(np.linalg.det(np.array([tr.bottom.p, tr.bottom.q]) - s.q))
-                if sign <= 0: # точка должна быть выше
-                    correct = False
-            if tr.top != None and tr.top.p == s.p:
-                isTrCorrect = True
-                # TODO: предикат поворота взять из общей библиотеки
-                sign = np.sign(np.linalg.det(np.array([tr.top.p, tr.top.q]) - s.q))
-                if sign >= 0: # точка должна быть ниже
-                    correct = False
-            if not isTrCorrect:
-                raise Exception('Error')
-            if correct:
-                if firstTr == None:
-                    # Нашли трапецоид. Он должен быть единственным
-                    firstTr = tr
-                else: 
-                    raise Exception('Error: нашли более 1 трапецоида')
-        if firstTr == None:
-            raise Exception('Error: не нашли трапецоид')
-    return firstTr
-    
-def insert(tmap, s):
-    "Вставка отрезка в трапецоидную карту"
+
+def insert(tmap: TrapezoidMap, s: Segment):
+    """Вставка отрезка в трапецоидную карту"""
     tmap.segments.append(s)
-    # локализуем первую точку
-    localizedList = localize(tmap, s.p)
-    firstTr = None
-    if len(localizedList) == 1:
-        # Левая вершина отрезка не попала на вершину другого отерзка
-        firstTr = localizedList[0]
-        # TODO: лексикографическое сравнение точек взять из общей библиотеки
-        if firstTr.isMostLeft() or s.p[0] > firstTr.leftp[0] or (s.p[0] == firstTr.leftp[0] and s.p[1] > firstTr.leftp[1]):
-            if firstTr.isMostRight() or s.q[0] < firstTr.rightp[0] or s.q[0] == firstTr.rightp[0] and s.q[1] < firstTr.rightp[1]:
-                # Простой случай: вставка отрезка целиком в один трапецоид
-                insertSegment(tmap, s, firstTr)
-                return
-        # Вставим отрезок в самый левый трапецоид
-        trNodes = leftInsert(tmap, s, firstTr)
-        if s.q == firstTr.rightp: # s.q попала на другую вершину, значит уже закончили вставку
+    # Локализуемся, чтобы найти первый трапецоид
+    first_tr = localize(tmap, s)
+    if first_tr.is_leftmost() or first_tr.leftp.__lt__(s.p):
+        # Нужно создать левый трапецоид
+        if first_tr.is_rightmost() or s.q.__lt__(first_tr.rightp):
+            # Простой случай: вставка отрезка целиком в один трапецоид
+            insert_segment(tmap, s, first_tr)
             return
+        else:
+            # Вставим отрезок в самый левый трапецоид
+            undone_left_tr = left_insert(tmap, s, first_tr)
+            if s.q.__eq__(first_tr.rightp):
+                # s.q попала на другую вершину, значит уже закончили вставку
+                return
     else:
         # Левая вершина отрезка попала на вершину другого отерзка
-        # Надо выбрать тот трапецоид, в котором пойдет новый отрезок.
-        firstTr = chooseTrapezoid(localizedList, s)
-        trNodes = firstTr.leftnb
-        if not firstTr.isMostRight() and (firstTr.rightp[0] < s.q[0] or (firstTr.rightp[0] == s.q[0] and firstTr.rightp[1] < s.q[1])):
-            trNodes = segmentInsert(tmap, s, firstTr, trNodes)
-    # Найдем, какие трапецоиды пересекает новый отрезок
-    trList = intersectSegment(s, firstTr)
-    lastTr = firstTr
-    firstTr = next(trList, None)
-    while firstTr != None:
-        lastTr = next(trList, None)
-        if lastTr == None: # Получили последний трапецоид
-            lastTr, firstTr = firstTr, lastTr
-        else: # Вставляем очередной трапецоид
-            trNodes = segmentInsert(tmap, s, firstTr, trNodes)
-            firstTr = lastTr
+        assert s.p.__eq__(first_tr.leftp)
+        undone_left_tr = first_tr.leftnb
+        if not first_tr.is_rightmost() and first_tr.rightp.__lt__(s.q):
+            # Вставим отрезок, если трапецоид не последний
+            undone_left_tr = segment_insert(tmap, s, first_tr, undone_left_tr)
+    tr_list = intersect_segment(s, first_tr)
+    last_tr = first_tr
+    first_tr = next(tr_list, None)
+    while first_tr is not None:
+        last_tr = next(tr_list, None)
+        if last_tr is None:  # Получили последний трапецоид
+            last_tr, first_tr = first_tr, last_tr
+        else:  # Вставляем очередной трапецоид
+            undone_left_tr = segment_insert(tmap, s, first_tr, undone_left_tr)
+            first_tr = last_tr
     # Вставляем последний трапецоид
-    rightInsert(tmap, s, lastTr, trNodes)
+    right_insert(tmap, s, last_tr, undone_left_tr)

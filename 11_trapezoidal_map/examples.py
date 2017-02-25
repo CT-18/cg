@@ -1,10 +1,11 @@
-from solution import * # Реализация трапецоидной карты
+from solution import *  # Реализация трапецоидной карты
 
 import ipywidgets as widgets
 from IPython.display import Image
 import matplotlib.pyplot as plt
 
-def slideshow(folder = 'insert', period = 1500):
+
+def slideshow(folder='insert', period=1500):
     images = []
     if folder == 'insert':
         n = 8
@@ -21,22 +22,22 @@ def slideshow(folder = 'insert', period = 1500):
         n = 12
         image_width = '100%'
         comments = ['Начало',
-                   'q левее p5',
-                   'q правее p12',
-                   'q правее q12',
-                   'q левее p22',
-                   'q ниже s21',
-                   'q выше s17',
-                   'q правее q14',
-                   'q левее q15',
-                   'q выше s15',
-                   'q выше s20',
-                   'Ответ: Δ14']
+                    'q левее p5',
+                    'q правее p12',
+                    'q правее q12',
+                    'q левее p22',
+                    'q ниже s21',
+                    'q выше s17',
+                    'q правее q14',
+                    'q левее q15',
+                    'q выше s15',
+                    'q выше s20',
+                    'Ответ: Δ14']
     for i in range(n):
-        imageName = 'images/' + folder + '/'+ str(i + 1) + '.jpg'
+        imageName = 'images/' + folder + '/' + str(i + 1) + '.jpg'
         images.append(open(imageName, 'rb').read())
     widget = widgets.Image(value=images[0], format='jgp', width=image_width)
-    
+
     play = widgets.Play(
         value=0,
         min=0,
@@ -48,7 +49,7 @@ def slideshow(folder = 'insert', period = 1500):
     slider = widgets.IntSlider(
         value=0,
         min=0,
-        max=n-1,
+        max=n - 1,
         step=1
     )
     text = widgets.Text(
@@ -57,36 +58,39 @@ def slideshow(folder = 'insert', period = 1500):
         description='',
         disabled=True
     )
-    
+
     def view_image(i):
         widget.value = images[i['new']]
         text.value = comments[i['new']]
-    
+
     slider.observe(view_image, names='value')
     widgets.jslink((play, 'value'), (slider, 'value'))
     box = widgets.VBox([widget, widgets.HBox([play, slider, text])])
     return box
 
-#Методы для отрисовки трапецоида
+
+# Методы для отрисовки трапецоида
 def perp(a):
     b = np.empty_like(a)
     b[0] = -a[1]
     b[1] = a[0]
     return b
 
+
 def intersectionPoint(a1, a2, b1, b2):
     """Возвращает точку пересечения отрезков"""
     a1 = np.array([a1[0], a1[1]])
     a2 = np.array([a2[0], a2[1]])
-    b1 = np.array([b1[0], b1[1]])
-    b2 = np.array([b2[0], b2[1]])
-    da = a2-a1
-    db = b2-b1
-    dp = a1-b1
+    b1 = np.array([b1.coord[0], b1.coord[1]])
+    b2 = np.array([b2.coord[0], b2.coord[1]])
+    da = a2 - a1
+    db = b2 - b1
+    dp = a1 - b1
     dap = perp(da)
-    denom = np.dot( dap, db)
-    num = np.dot( dap, dp )
-    return (num / denom.astype(float))*db + b1
+    denom = np.dot(dap, db)
+    num = np.dot(dap, dp)
+    return (num / denom.astype(float)) * db + b1
+
 
 def points(trapezoid):
     """Возвращает угловые точки трапецоида"""
@@ -94,48 +98,51 @@ def points(trapezoid):
     q2 = [0, 500]
     q3 = [500, 500]
     q4 = [500, 0]
-    if trapezoid.leftp != None:
-        q1[0] = trapezoid.leftp[0]
-        q2[0] = trapezoid.leftp[0]
-    if trapezoid.rightp != None:
-        q3[0] = trapezoid.rightp[0]
-        q4[0] = trapezoid.rightp[0]
-    if trapezoid.top != None:
+    if trapezoid.leftp is not None:
+        q1[0] = trapezoid.leftp.coord[0]
+        q2[0] = trapezoid.leftp.coord[0]
+    if trapezoid.rightp is not None:
+        q3[0] = trapezoid.rightp.coord[0]
+        q4[0] = trapezoid.rightp.coord[0]
+    if trapezoid.top is not None:
         intp = intersectionPoint(q1, q2, trapezoid.top.p, trapezoid.top.q)
         q2[1] = intp[1]
         intp = intersectionPoint(q3, q4, trapezoid.top.p, trapezoid.top.q)
         q3[1] = intp[1]
-    if trapezoid.bottom != None:
+    if trapezoid.bottom is not None:
         intp = intersectionPoint(q1, q2, trapezoid.bottom.p, trapezoid.bottom.q)
         q1[1] = intp[1]
         intp = intersectionPoint(q3, q4, trapezoid.bottom.p, trapezoid.bottom.q)
         q4[1] = intp[1]
     return [q1, q2, q3, q4]
 
+
 tmap = None
 leftPoint = None
 figure = None
+
 
 def interactive_example():
     global leftPoint, tmap, figure
     tmap = TrapezoidMap()
     leftPoint = None
-    figure = plt.figure(num=1, figsize=(12,5), dpi=65)
+    figure = plt.figure(num=1, figsize=(12, 5), dpi=65)
     cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
     plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
     plt.axis('off')
     plt.margins(0.01)
     plt.show()
 
+
 def OnClick(event):
     global leftPoint, tmap
     if not event.dblclick:
-        if leftPoint == None:
-            leftPoint = [int(round(event.xdata)), int(round(event.ydata))]
-            plt.plot(leftPoint[0],leftPoint[1],'ro')
+        if leftPoint is None:
+            leftPoint = Point(int(round(event.xdata)), int(round(event.ydata)))
+            plt.plot(leftPoint.coord[0], leftPoint.coord[1], 'ro')
         else:
-            rightPoint = [int(round(event.xdata)), int(round(event.ydata))]
-            if (leftPoint[0] > rightPoint[0]):
+            rightPoint = Point(int(round(event.xdata)), int(round(event.ydata)))
+            if (rightPoint.__lt__(leftPoint)):
                 leftPoint, rightPoint = rightPoint, leftPoint
             seg = Segment(leftPoint, rightPoint)
             insert(tmap, seg)
@@ -143,15 +150,15 @@ def OnClick(event):
             figure.clear()
             plt.axis('off')
             plt.margins(0.01)
-            plt.plot(leftPoint[0], leftPoint[1],'ro')
-            plt.plot(rightPoint[0], rightPoint[1],'ro')
+            plt.plot(leftPoint.coord[0], leftPoint.coord[1], 'ro')
+            plt.plot(rightPoint.coord[0], rightPoint.coord[1], 'ro')
             plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
             # Перерисуем карту
             for tr in tmap.tr:
                 data = points(tr)
-                if not tr.isMostLeft():
+                if not tr.is_leftmost():
                     plt.plot([data[0][0], data[1][0]], [data[0][1], data[1][1]], 'k')
-                if not tr.isMostRight():
+                if not tr.is_rightmost():
                     plt.plot([data[2][0], data[3][0]], [data[2][1], data[3][1]], 'k')
             for segment in tmap.segments:
                 plt.plot([segment.p[0], segment.q[0]], [segment.p[1], segment.q[1]], 'r')

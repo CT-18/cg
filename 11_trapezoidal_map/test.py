@@ -1,195 +1,184 @@
 from TMapClasses import *
+from cg import Point
 import solution
 
+
 # Набор методов для проверки корректности локализацоинной структуры и трапецоидной карты
-def segmentEqual(s0, s1):
-    if s0 == None:
-        return s1 == None
-    elif s1 == None:
+def segment_equal(s0, s1):
+    if s0 is None:
+        return s1 is None
+    elif s1 is None:
         return False
     else:
-        return s0.p == s1.p and s0.q == s1.q
+        return s0.p.__eq__(s1.p) and s0.q.__eq__(s1.q)
 
-def dataEqual(tr0, tr1):
+
+def data_equal(tr0, tr1):
     # Проверка на то, совпадают ли точки и отрезки трапецоидов
-    if tr0.leftp != tr1.leftp:
+    if not tr0.leftp.__eq__(tr1.leftp):
         return False
-    if tr0.rightp != tr1.rightp:
+    if not tr0.rightp.__eq__(tr1.rightp):
         return False
-    if segmentEqual(tr0.top, tr1.top):
-        if segmentEqual(tr0.bottom, tr1.bottom):
+    if segment_equal(tr0.top, tr1.top):
+        if segment_equal(tr0.bottom, tr1.bottom):
             return True
     return False
 
-def neighbourEqual(tr0, tr1):
-    if tr0 == None:
-        return tr1 == None
-    elif tr1 == None:
+
+def neighbour_equal(tr0, tr1):
+    if tr0 is None:
+        return tr1 is None
+    elif tr1 is None:
         return False
     else:
-        return dataEqual(tr0, tr1)
+        return data_equal(tr0, tr1)
 
-def trapezoidEqual(tr0, tr1):
-    if not dataEqual(tr0, tr1):
+
+def trapezoid_equal(tr0, tr1):
+    if not data_equal(tr0, tr1):
         return False
     for i in range(2):
-        if not neighbourEqual(tr0.leftnb[i], tr1.leftnb[i]):
+        if not neighbour_equal(tr0.leftnb[i], tr1.leftnb[i]):
             return False
-        if not neighbourEqual(tr0.rightnb[i], tr1.rightnb[i]):
+        if not neighbour_equal(tr0.rightnb[i], tr1.rightnb[i]):
             return False
     return True
 
-def nodeEqual(n0, n1):
-    if n0 == None:
-        return n1 == None
-    elif n1 == None:
+
+def node_equal(n0, n1):
+    if n0 is None:
+        return n1 is None
+    elif n1 is None:
         return False
     if type(n0) != type(n1):
         return False
-    
+
     if n0.__name__ == TrapezoidNode.__name__:
         if len(n0.links) != len(n1.links):
             return False
-        return trapezoidEqual(n0.tr, n1.tr)
+        return trapezoid_equal(n0.tr, n1.tr)
     if n0.__name__ == XNode.__name__:
-        if n0.point != n1.point:
+        if not n0.point.__eq__(n1.point):
             return False
     elif n0.__name__ == YNode.__name__:
-        if not segmentEqual(n0.segment, n1.segment):
+        if not segment_equal(n0.segment, n1.segment):
             return False
-    return nodeEqual(n0.left, n1.left) and nodeEqual(n0.right, n1.right)
+    return node_equal(n0.left, n1.left) and node_equal(n0.right, n1.right)
 
-def isMapEqual(map0, map1):
+
+def tmap_equal(map0, map1):
     """Проверка двух трапецоидных карт на идентичность"""
-    return nodeEqual(map0.root, map1.root)
+    return node_equal(map0.root, map1.root)
 
 
-def buildTMap():
+def build_tmap():
     """Построение трапецоидной карты из примера"""
-    # Пока что в float координатах, надо бы в целые перевести
     tmap = TrapezoidMap()
     f = open("tests/example.off", "r")
     f.readline()
     line = f.readline()
     n = int(line[0:2])
     m = int(line[5:7])
-    pointsList = []
-    segments = []
+    point_list = []
     i = 0
     while i < n:
         pair = f.readline().split(' ')
-        pointsList.append([float(pair[0]),float(pair[1])])
+        point_list.append([int(pair[0]), int(pair[1])])
         i += 1
     i = 0
     while i < m:
         pair = f.readline().split(' ')
         p1 = int(pair[0]) - 1
         p2 = int(pair[1]) - 1
-        if (pointsList[p2][0] < pointsList[p1][0]):
-            p1,p2 = p2,p1
-        solution.insert(tmap, Segment(pointsList[p1], pointsList[p2]))
+        p = Point(point_list[p1][0], point_list[p1][1])
+        q = Point(point_list[p2][0], point_list[p2][1])
+        if q.__lt__(p):
+            p, q = q, p
+        solution.insert(tmap, Segment(p, q))
         i += 1
     f.close()
     return tmap
 
+
 def intersection_test(func):
-    tmap = buildTMap()
-    isCorrect = True
+    tmap = build_tmap()
+    correct = True
     with open('tests/example_segments.txt') as f:
         n = int(next(f))
         for i in range(n):
-            px, py, qx, qy = [float(x) for x in next(f).split()]
-            s = Segment([px, py], [qx, qy])
-            firstTr = solution.localize(tmap, [px, py])[0]
-            answer = solution.intersectSegment(s, firstTr)
-            check = func(s, firstTr)
+            px, py, qx, qy = [int(x) for x in next(f).split()]
+            s = Segment(Point(px, py), Point(qx, qy))
+            first_tr = solution.localize(tmap, s)
+            answer = solution.intersect_segment(s, first_tr)
+            check = func(s, first_tr)
             if type(check) == type(answer):
                 temp = []
                 item = next(check, None)
-                while item != None:
+                while item is not None:
                     temp.append(item)
                     item = next(check, None)
                 check = temp
-            nextTr = next(answer, None)
+            next_tr = next(answer, None)
             pos = 0
-            while nextTr != None:
+            while next_tr is not None:
                 if pos >= len(check):
-                    isCorrect = False
+                    correct = False
                     break
                 tr = check[pos]
-                if not dataEqual(tr, nextTr):
-                    isCorrect = False
+                if not data_equal(tr, next_tr):
+                    correct = False
                     break
-                pos = pos + 1
-                nextTr = next(answer, None)
+                pos += 1
+                next_tr = next(answer, None)
             if pos != len(check):
-                isCorrect = False
+                correct = False
                 break
-    return isCorrect
+    return correct
 
 
 def simple_insert_test(insert):
     for i in range(7):
-        with open('tests/'+str(i)) as f:
+        with open('tests/' + str(i)) as f:
             n = int(next(f))
             answer = TrapezoidMap()
             check = TrapezoidMap()
-            segmentList = []
+            segment_list = []
             for j in range(n):
-                px, py, qx, qy = [float(x) for x in next(f).split()]
-                s = Segment([px, py], [qx, qy])
-                segmentList.append(s)
+                px, py, qx, qy = [int(x) for x in next(f).split()]
+                s = Segment(Point(px, py), Point(qx, qy))
+                segment_list.append(s)
                 solution.insert(answer, s)
                 insert(check, s)
-            if not isMapEqual(answer, check):
+            if not tmap_equal(answer, check):
                 return False
             if i in [2, 6]:
-                for j in range(250):
+                for j in range(50):
                     answer = TrapezoidMap()
                     check = TrapezoidMap()
                     for pos in np.random.permutation(n):
-                        solution.insert(answer, segmentList[pos])
-                        insert(check, segmentList[pos])
-                    if not isMapEqual(answer, check):
+                        solution.insert(answer, segment_list[pos])
+                        insert(check, segment_list[pos])
+                    if not tmap_equal(answer, check):
                         return False
     return True
 
 
-def nonCrossing_insert_test(insert):
+def non_crossing_insert_test(insert):
     if not simple_insert_test(insert):
         print('Простые тесты не пройдены')
         return False
     with open('tests/7') as f:
         n = int(next(f))
-        segmentList = []
+        segment_list = []
         for j in range(n):
-            px, py, qx, qy = [float(x) for x in next(f).split()]
-            segmentList.append(Segment([px, py], [qx, qy]))
-        for j in range(50):
+            px, py, qx, qy = [int(x) for x in next(f).split()]
+            segment_list.append(Segment(Point(px, py), Point(qx, qy)))
+        for j in range(10):
             answer = TrapezoidMap()
             check = TrapezoidMap()
             for pos in np.random.permutation(n):
-                solution.insert(answer, segmentList[pos])
-                insert(check, segmentList[pos])
-            if not isMapEqual(answer, check):
-                return False
-    return True
-
-
-def choose_test(choose):
-    with open('tests/8') as f:
-        n = int(next(f))
-        tmap = TrapezoidMap()
-        for j in range(n):
-            px, py, qx, qy = [float(x) for x in next(f).split()]
-            solution.insert(tmap, Segment([px, py], [qx, qy]))
-        n = int(next(f))
-        for j in range(n):
-            px, py, qx, qy = [float(x) for x in next(f).split()]
-            s = Segment([px, py], [qx, qy])
-            localizedList = solution.localize(tmap, s.p)
-            tr0 = solution.chooseTrapezoid(localizedList, s)
-            tr1 = choose(localizedList, s)
-            if not trapezoidEqual(tr0, tr1):
+                solution.insert(answer, segment_list[pos])
+                insert(check, segment_list[pos])
+            if not tmap_equal(answer, check):
                 return False
     return True
