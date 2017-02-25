@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import ipywidgets as widgets
 import traitlets
 
-from hidden import VType
+from hidden import VType, Vertex
 
 def natural_sort(l): 
     convert = lambda text: int(text) if text.isdigit() else text.lower() 
@@ -118,7 +118,98 @@ def visual_dump_ear_clipping_triangulation(cur_v, D, D1, S, filename):
     plt.savefig(filename)
     plt.close(fig)
     
+def visual_dump_bypass(cur_v, D, filename):
+    xmin, xmax = min([i.origin.x for i in D]) - 2, max([i.origin.x for i in D]) + 2
+    ymin, ymax = min([i.origin.y for i in D]) - 2, max([i.origin.y for i in D]) + 2
+    fig = plt.figure(figsize=(5,5))
+    for h in D:
+        xs = [h.origin.x, h.twin.origin.x]
+        ys = [h.origin.y, h.twin.origin.y]
+        plt.plot(xs,ys,'k-')
+    if not cur_v is None:
+        plt.plot(cur_v.x, cur_v.y, 'yo')
+    plt.axis([xmin,xmax, ymin,ymax])
+    plt.savefig(filename)
+    plt.close(fig)
     
+from enum import Enum
+class Merging_step(Enum):
+    BEFORE_START = 0
+    LEFT_LOWER = 1
+    RAY = 2
+    INTERSECTED = 3
+    REFLEX_VERTEXES = 4
+    REFLEX_SORTING = 5
+    CLOSEST = 6
+    MERGE = 7
+
+def visual_dump_holes_merging(args, D, holes, filename):
+    xmin, xmax = min([i.origin.x for i in D]) - 2, max([i.origin.x for i in D]) + 2
+    ymin, ymax = min([i.origin.y for i in D]) - 2, max([i.origin.y for i in D]) + 2
+    fig = plt.figure(figsize=(5,5))
+
+    def draw_ray(args):
+        xs = [args['ray'][0].x, args['ray'][1].x]
+        ys = [args['ray'][0].y, args['ray'][1].y]
+        plt.plot(xs, ys, 'g--')
+
+    def draw_triangle(args):
+        for i in range(3):
+            xs = [args['triangle'][i].x, args['triangle'][(i + 1) % 3].x]
+            ys = [args['triangle'][i].y, args['triangle'][(i + 1) % 3].y]
+            plt.plot(xs,ys,'m--')
+
+    for h in D:
+        xs = [h.origin.x, h.twin.origin.x]
+        ys = [h.origin.y, h.twin.origin.y]
+        plt.plot(xs,ys,'k-')
+    for hole in holes:
+        for h in hole:
+            xs = [h.origin.x, h.twin.origin.x]
+            ys = [h.origin.y, h.twin.origin.y]
+            plt.plot(xs,ys,'k-')
+    
+    step = args['step']
+    if step == Merging_step.BEFORE_START:
+        pass
+    elif step == Merging_step.LEFT_LOWER:
+        plt.plot(args['llh'].origin.x, args['llh'].origin.y, 'yo')
+    elif step == Merging_step.RAY:
+        draw_ray(args)
+    elif step == Merging_step.INTERSECTED:
+        draw_ray(args)
+        for x, y, h in args['intersected']:
+            xs = [h.origin.x, h.twin.origin.x]
+            ys = [h.origin.y, h.twin.origin.y]
+            plt.plot(xs,ys,'r-')
+    elif step == Merging_step.REFLEX_VERTEXES:
+        draw_ray(args)
+        if isinstance(args['closest'], Vertex):
+            plt.plot(args['closest'].x, args['closest'].y, 'ro')
+        else:
+            xs = [args['closest'].origin.x, args['closest'].twin.origin.x]
+            ys = [args['closest'].origin.y, args['closest'].twin.origin.y]
+            plt.plot(xs,ys,'r-')
+    elif step == Merging_step.REFLEX_SORTING:
+        draw_triangle(args)
+        for h in args['reflex']:
+            plt.plot(h.origin.x, h.origin.y, 'ro')
+            xs = [args['triangle'][0].x, h.origin.x]
+            ys = [args['triangle'][0].y, h.origin.y]
+            plt.plot(xs,ys,'b:')
+            
+    elif step == Merging_step.CLOSEST:
+        draw_triangle(args)
+        plt.plot(args['closest'].origin.x, args['closest'].origin.y, 'ro')
+    elif step == Merging_step.MERGE:
+        for h in args['polygon']:
+            xs = [h.origin.x, h.twin.origin.x]
+            ys = [h.origin.y, h.twin.origin.y]
+            plt.plot(xs,ys,'k-')
+    
+    plt.axis([xmin,xmax, ymin,ymax])
+    plt.savefig(filename)
+    plt.close(fig)
 
 def create_dump_func(folder, func, *args):
     c = 0
