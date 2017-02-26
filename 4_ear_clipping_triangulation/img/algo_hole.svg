@@ -161,7 +161,6 @@
          inkscape:connector-curvature="0" />
     </marker>
     <linearGradient
-       inkscape:collect="always"
        id="linearGradient8704"
        osb:paint="gradient">
       <stop
@@ -2832,9 +2831,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="0.70710678"
-     inkscape:cx="379.38312"
-     inkscape:cy="203.09968"
+     inkscape:zoom="1"
+     inkscape:cx="599.86876"
+     inkscape:cy="388.88408"
      inkscape:document-units="px"
      inkscape:current-layer="layer1-3"
      showgrid="false"
@@ -2855,7 +2854,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -3175,6 +3174,13 @@
              height="63.63961"
              x="-394.56558"
              y="-105.3382" /></flowRegion><flowPara
-           id="flowPara9685"></flowPara></flowRoot>    </g>
+           id="flowPara9685" /></flowRoot>      <ellipse
+         ry="3.6239223"
+         rx="3.889087"
+         cy="99.09269"
+         cx="1014.6583"
+         id="path8841-3"
+         style="opacity:1;fill:#ff0000;fill-opacity:1;fill-rule:evenodd;stroke:#010006;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    </g>
   </g>
 </svg>
