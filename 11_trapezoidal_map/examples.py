@@ -150,8 +150,6 @@ def OnClick(event):
             figure.clear()
             plt.axis('off')
             plt.margins(0.01)
-            plt.plot(leftPoint.coord[0], leftPoint.coord[1], 'ro')
-            plt.plot(rightPoint.coord[0], rightPoint.coord[1], 'ro')
             plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
             # Перерисуем карту
             for tr in tmap.tr:
@@ -162,4 +160,6 @@ def OnClick(event):
                     plt.plot([data[2][0], data[3][0]], [data[2][1], data[3][1]], 'k')
             for segment in tmap.segments:
                 plt.plot([segment.p[0], segment.q[0]], [segment.p[1], segment.q[1]], 'r')
+            plt.plot(leftPoint.coord[0], leftPoint.coord[1], 'ro')
+            plt.plot(rightPoint.coord[0], rightPoint.coord[1], 'ro')
             leftPoint = None
