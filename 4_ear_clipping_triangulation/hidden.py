@@ -109,3 +109,38 @@ def add_diagonal_with_next(hfrom, hto):
 
     d.next = hto
     return d
+
+def merge_polygons(outer_polygon, outer_h, inner_polygon, inner_h):
+    outer_prev = outer_h.prev
+    inner_prev = inner_h.prev
+
+    def add_edge(from_h, to_h):
+            # новое ребро
+            h = Hedge(Vertex(from_h.next.origin.x, from_h.next.origin.y))
+            h.twin = Hedge(Vertex(to_h.origin.x, to_h.origin.y))
+            h.twin.twin = h
+
+            # from -> new 
+            from_h.next = h
+            h.prev = from_h  
+            from_h.twin.prev = h.twin
+            h.twin.next = from_h.twin
+
+            # new -> to
+            h.next = to_h
+            to_h.prev = h
+            h.twin.prev = to_h.twin
+            to_h.twin.prev = h.twin
+            
+            return h
+
+    h1 = add_edge(outer_prev, inner_h)
+    h2 = add_edge(inner_prev, outer_h)
+
+    outer_polygon.append(h1)
+    outer_polygon.append(h2)
+    for hedge in inner_polygon:
+        outer_polygon.append(hedge)
+    inner_polygon.clear()
+
+    return outer_polygon
