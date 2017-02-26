@@ -3,6 +3,7 @@ from solution import *  # Реализация трапецоидной карт
 import ipywidgets as widgets
 from IPython.display import Image
 import matplotlib.pyplot as plt
+import math
 
 
 def slideshow(folder='insert', period=1500):
@@ -118,14 +119,14 @@ def points(trapezoid):
 
 
 tmap = None
-leftPoint = None
+left_point = None
 figure = None
 
 
 def interactive_example():
-    global leftPoint, tmap, figure
+    global left_point, tmap, figure
     tmap = TrapezoidMap()
-    leftPoint = None
+    left_point = None
     figure = plt.figure(num=1, figsize=(12, 5), dpi=65)
     cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
     plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
@@ -134,17 +135,39 @@ def interactive_example():
     plt.show()
 
 
+def find_nearest_point(x, y):
+    global tmap
+    minx = x
+    miny = y
+    for segment in tmap.segments:
+        dx = int(abs(x - segment.p.coord[0]))
+        dy = int(abs(y - segment.p.coord[1]))
+        dist = math.sqrt(dx*dx + dy*dy)
+        if dist < 10.0:
+            minx = segment.p.coord[0]
+            miny = segment.p.coord[1]
+            break
+        dx = int(abs(x - segment.q.coord[0]))
+        dy = int(abs(y - segment.q.coord[1]))
+        dist = math.sqrt(dx * dx + dy * dy)
+        if dist < 10.0:
+            minx = segment.q.coord[0]
+            miny = segment.q.coord[1]
+            break
+    return Point(int(minx), int(miny))
+
+
 def OnClick(event):
-    global leftPoint, tmap
+    global left_point, tmap
     if not event.dblclick:
-        if leftPoint is None:
-            leftPoint = Point(int(round(event.xdata)), int(round(event.ydata)))
-            plt.plot(leftPoint.coord[0], leftPoint.coord[1], 'ro')
+        if left_point is None:
+            left_point = find_nearest_point(int(round(event.xdata)), int(round(event.ydata)))
+            plt.plot(left_point.coord[0], left_point.coord[1], 'ro')
         else:
-            rightPoint = Point(int(round(event.xdata)), int(round(event.ydata)))
-            if (rightPoint.__lt__(leftPoint)):
-                leftPoint, rightPoint = rightPoint, leftPoint
-            seg = Segment(leftPoint, rightPoint)
+            right_point = find_nearest_point(int(round(event.xdata)), int(round(event.ydata)))
+            if (right_point.__lt__(left_point)):
+                left_point, right_point = right_point, left_point
+            seg = Segment(left_point, right_point)
             insert(tmap, seg)
             # Очистим карту
             figure.clear()
@@ -160,6 +183,6 @@ def OnClick(event):
                     plt.plot([data[2][0], data[3][0]], [data[2][1], data[3][1]], 'k')
             for segment in tmap.segments:
                 plt.plot([segment.p[0], segment.q[0]], [segment.p[1], segment.q[1]], 'r')
-            plt.plot(leftPoint.coord[0], leftPoint.coord[1], 'ro')
-            plt.plot(rightPoint.coord[0], rightPoint.coord[1], 'ro')
-            leftPoint = None
+            plt.plot(left_point.coord[0], left_point.coord[1], 'ro')
+            plt.plot(right_point.coord[0], right_point.coord[1], 'ro')
+            left_point = None
