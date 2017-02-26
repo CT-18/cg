@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 import ipywidgets as widgets
 import traitlets
 
-from hidden import VType, Vertex
+from cg import Point
+from hidden import VType, append_shorthands 
 
 def natural_sort(l): 
     convert = lambda text: int(text) if text.isdigit() else text.lower() 
@@ -184,7 +185,7 @@ def visual_dump_holes_merging(args, D, holes, filename):
             plt.plot(xs,ys,'r-')
     elif step == Merging_step.REFLEX_VERTEXES:
         draw_ray(args)
-        if isinstance(args['closest'], Vertex):
+        if isinstance(args['closest'], Point):
             plt.plot(args['closest'].x, args['closest'].y, 'ro')
         else:
             xs = [args['closest'].origin.x, args['closest'].twin.origin.x]

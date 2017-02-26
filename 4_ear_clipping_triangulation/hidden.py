@@ -1,6 +1,9 @@
 from enum import Enum
+from cg import Point
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
+def point_comp_lex(self, other):
+    return self.coord[0] < other.coord[0] or (self.coord[0] == other.coord[0] and self.coord[1] < other.coord[1])
 
 class VType(Enum):
     start = 1
@@ -12,24 +15,24 @@ class VType(Enum):
 def turn(v1, v2, v3):
     return (v2.x - v1.x) * (v3.y - v1.y) - (v3.x - v1.x) * (v2.y - v1.y)
 
-class Vertex:
-    """
-    Класс точки с компаратором, подходящим для нашей задачи
-    """
-    def __init__(self, px, py):
-        self.x = px
-        self.y = py
-        self.hedge = None
-        self.vtype = None
-    
-    def __lt__(self, other):
-        return self.y > other.y or (self.y == other.y and self.x < other.x)
-    
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-    def __repr__(self):
-        return '({0};{1})'.format(self.x,self.y)
+#    class Vertex:
+#        """
+#        Класс точки с компаратором, подходящим для нашей задачи
+#        """
+#        def __init__(self, px, py):
+#            self.x = px
+#            self.y = py
+#            self.hedge = None
+#            self.vtype = None
+#        
+#        def __lt__(self, other):
+#            return self.y > other.y or (self.y == other.y and self.x < other.x)
+#        
+#        def __eq__(self, other):
+#            return self.x == other.x and self.y == other.y
+#
+#        def __repr__(self):
+#            return '({0};{1})'.format(self.x,self.y)
 
     
 class Hedge:
@@ -45,8 +48,14 @@ class Hedge:
     def __repr__(self):
         return '{}->{}'.format(self.origin, self.twin.origin)
     
+def append_shorthands(points):
+    for p in points:
+        p.x = p.coord[0]
+        p.y = p.coord[1]
+
 
 def build_dcel(vert):
+    append_shorthands(vert)
     dcel = []
     start = Hedge(vert[0])
     start.twin = Hedge(vert[1])
@@ -116,8 +125,12 @@ def merge_polygons(outer_polygon, outer_h, inner_polygon, inner_h):
 
     def add_edge(from_h, to_h):
             # новое ребро
-            h = Hedge(Vertex(from_h.next.origin.x, from_h.next.origin.y))
-            h.twin = Hedge(Vertex(to_h.origin.x, to_h.origin.y))
+            tmp = Point(int(from_h.next.origin.x),int(from_h.next.origin.y))
+            append_shorthands([tmp])
+            h = Hedge(tmp)
+            tmp = Point(int(to_h.origin.x), int(to_h.origin.y))
+            append_shorthands([tmp])
+            h.twin = Hedge(tmp)
             h.twin.twin = h
 
             # from -> new 

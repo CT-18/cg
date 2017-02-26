@@ -1,3 +1,4 @@
+#from cg import turn
 from hidden import turn
 
 def is_outer_answer(v0,v1,v2,v):

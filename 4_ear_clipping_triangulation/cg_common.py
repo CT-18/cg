@@ -1,5 +1,6 @@
 import numpy as np
-
+#from cg import turn
+from hidden import turn
 
 def point_belongs_to_segment(p, a, b):  # as we know both segments lay on the same line
     left, right, p_ = 0, 0, 0
@@ -34,3 +35,8 @@ def get_intersection_point(a, b, c, d):
         raise Exception('Incorrect test!')
     return np.array([p[0], p[1], 1])
 
+def surf_intersection(point, *lines):
+    for line in lines:
+        if turn(line[0], line[1], point) < 0:
+            return False
+    return True
