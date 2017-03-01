@@ -17,3 +17,14 @@ def dist(q, p):
     dx, dy = q[0] - p[0], q[1] - p[1]
     return dx * dx + dy * dy
 
+def plot_melkman(points, ans):
+	xs = [x[0] for x in points]
+	ys = [y[1] for y in points]
+	plt.plot(xs, ys, 'o-', color='black', linewidth=2)
+
+	x = [x[0] for x in ans]
+	y = [x[1] for x in ans]
+	plt.plot(x, y, 'k-', color='#00ff00', linewidth=3)
+	plt.plot(x, y, 'o', color='red', markersize=8)
+	plt.axis([0, 15, -1, 10])
+	plt.show()
