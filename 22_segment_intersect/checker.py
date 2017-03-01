@@ -79,4 +79,4 @@ def check_Bentley_Ottmann_algorithm(plt, find_intersections):
             axis.scatter(x1, y1, c='black', s=30)
             axis.scatter(x2, y2, c='black', s=30)
         intersection_points = find_intersections(segments)
-        # TODO: how to create noninteger point?
+        # TODO: add comparison
