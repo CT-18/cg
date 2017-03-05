@@ -1,5 +1,43 @@
+from fractions import *
 from enum import Enum
 Type = Enum('Type', 'left right inter')
+
+
+class Point:
+    __slots__ = ("x", "y", "det")
+
+    def __init__(self, x=0, y=0, det=1):
+        self.x = x
+        self.y = y
+        self.det = det
+
+    def __add__(self, p):
+        return Point(Fraction(self.x, self.det) + Fraction(p.x, p.det),
+                     Fraction(self.y, self.det) + Fraction(p.y, p.det))
+
+    def __sub__(self, p):
+        return Point(Fraction(self.x, self.det) - Fraction(p.x, p.det),
+                     Fraction(self.y, self.det) - Fraction(p.y, p.det))
+
+    def __neg__(self):
+        return Point(-self.x, -self.y, self.det)
+
+    def __lt__(self, p):
+        return Fraction(self.x, self.det) < Fraction(p.x, p.det) or \
+               Fraction(self.x, self.det) == Fraction(p.x, p.det) and Fraction(self.y, self.det) < Fraction(p.y, p.det)
+
+    def __eq__(self, p):
+        return Fraction(self.x, self.det) == Fraction(p.x, p.det) and \
+               Fraction(self.y, self.det) == Fraction(p.y, p.det)
+
+    def __gt__(self, p):
+        return not (self < p or self == p)
+
+    def __hash__(self):
+        return hash(tuple([Fraction(self.x, self.det), Fraction(self.y, self.det)]))
+
+    def __repr__(self):
+        return "(%r, %r)" % (Fraction(self.x, self.det), Fraction(self.y, self.det))
 
 
 class Segment:
@@ -63,7 +101,7 @@ class Event:
     def __eq__(self, e):
         return self.t == e.t and \
                self.segment.id == e.segment.id and \
-               (self.addit_segment is None and e.addit_segment is None or 
+               (self.addit_segment is None and e.addit_segment is None or
                 self.addit_segment is not None and e.addit_segment is None and self.addit_segment == e.addit_segment)
 
     def __gt__(self, e):

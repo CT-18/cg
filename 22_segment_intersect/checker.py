@@ -1,7 +1,5 @@
-from fractions import *
 import numpy as np
-from cg import Point
-from entities import Segment
+from entities import Point, Segment
 
 import exercise_1_tests
 import Bentley_Ottmann_tests
@@ -11,25 +9,25 @@ def check_first_exercise(plt, get_intersection_point):
     test = exercise_1_tests.test
     
     def calculate_det(a, b):
-        return a[0] * b[1] - b[0] * a[1]
+        return a.x * b.y - b.x * a.y
 
     def bounding_box(p, a, b):
         if a > b:
             a, b = b, a
-        return a <= p <= b    
+        return a <= p <= b
 
     def check_overlap(p, a, b):
         orientation = np.sign(calculate_det(b - a, p - a))
         if orientation != 0:
             return False
-        return bounding_box(p[0], a[0], b[0]) and bounding_box(p[1], a[1], b[1])
+        return bounding_box(p.x, a.x, b.x) and bounding_box(p.y, a.y, b.y)
 
     def drow_points(axis, points, color):
         for point in points:
-            axis.scatter(point[0], point[1], c=color, s=40)
+            axis.scatter(point.x, point.y, c=color, s=40)
 
     def drow_segments(axis, a, b, color):
-        axis.plot([a[0], b[0]], [a[1], b[1]], c=color)
+        axis.plot([a.x, b.x], [a.y, b.y], c=color)
 
     f, axes = plt.subplots(2, 4, figsize=(11, 6))
     print("Part 1. Intersection tests")
@@ -41,18 +39,16 @@ def check_first_exercise(plt, get_intersection_point):
         drow_segments(axis, a, b, 'r')
         drow_points(axis, [c, d], 'b')
         drow_segments(axis, c, d, 'b')
-        if Fraction(answ[0], answ[2]) == Fraction(output[0], output[2]) \
-                and Fraction(answ[1], answ[2]) == Fraction(output[1], output[2]):
+        if output == answ:
             print("Test", i, "Ok")
         else:
             print("Test", i, "Failed:")
-            print("\t[x= {}, y= {}, det= {}]".format(answ[0], answ[1], answ[2]), "expected but")
-            print("\t[x= {}, y= {}, det= {}]".format(output[0], output[1], output[2]), "found")
+            print("\t", answ, "expected but", output, "found")
     print("Part 2. Overlap tests")
     for i in range(9, 21):
         a, b, c, d = test(i)
         output = get_intersection_point(a, b, c, d)
-        if check_overlap(output[:2] / output[2], a, b) and check_overlap(output[:2] / output[2], c, d):
+        if check_overlap(output, a, b) and check_overlap(output, c, d):
             print("Test", i, "Ok")
         else:
             print("Test", i, "Fail")

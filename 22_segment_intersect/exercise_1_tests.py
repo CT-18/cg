@@ -1,27 +1,27 @@
-import numpy as np
+from entities import Point
 
 
-def test(id) :
+def test(id):
     return {
-        1: [np.array([1, 1]), np.array([3, 3]), np.array([3, 3]), np.array([3, 2]), np.array([-6, -6, -2])],
-        2: [np.array([1, 1]), np.array([4, 5]), np.array([2, 1]), np.array([2, 5]), np.array([24, 28, 12])],
-        3: [np.array([-18, -34]), np.array([62, 15]), np.array([83, 7]), np.array([-8, 16]), np.array([277978, 51274, 5179])],
-        4: [np.array([0, 0]), np.array([1, 4]), np.array([2, 2]), np.array([0, 3]), np.array([6, 24, 9])],
-        5: [np.array([0, 0]), np.array([7, 1]), np.array([0, 1]), np.array([7, 0]), np.array([-49, -7, -14])],
-        6: [np.array([1, 2]), np.array([4, 2]), np.array([4, 2]), np.array([7, 2]), np.array([4, 2, 1])],
-        7: [np.array([0, 0]), np.array([5, 2]), np.array([3, 0]), np.array([2, 2]), np.array([30, 12, 12])],
-        8: [np.array([10, 1]), np.array([100, 80]), np.array([30, 2]), np.array([-60, 95]), np.array([330300, 169530, 15480])],
+        1: [Point(1, 1), Point(3, 3), Point(3, 3), Point(3, 2), Point(-6, -6, -2)],
+        2: [Point(1, 1), Point(4, 5), Point(2, 1), Point(2, 5), Point(24, 28, 12)],
+        3: [Point(-18, -34), Point(62, 15), Point(83, 7), Point(-8, 16), Point(277978, 51274, 0)],
+        4: [Point(0, 0), Point(1, 4), Point(2, 2), Point(0, 3), Point(6, 24, 9)],
+        5: [Point(0, 0), Point(7, 1), Point(0, 1), Point(7, 0), Point(-49, -7, -14)],
+        6: [Point(1, 2), Point(4, 2), Point(4, 2), Point(7, 2), Point(4, 2, 1)],
+        7: [Point(0, 0), Point(5, 2), Point(3, 0), Point(2, 2), Point(30, 12, 12)],
+        8: [Point(10, 1), Point(100, 80), Point(30, 2), Point(-60, 95), Point(330300, 169530, 15480)],
         
-        9: [np.array([-1, 1]), np.array([3, 1]), np.array([1, 1]), np.array([5, 1])],
-        10: [np.array([-2, -2]), np.array([-2, 6]), np.array([-2, 3]), np.array([-2, 10])],
-        11: [np.array([1, 1]), np.array([5, 5]), np.array([3, 3]), np.array([7, 7])],
-        12: [np.array([10, -10]), np.array([1, -1]), np.array([-5, 5]), np.array([5, -5])],
-        13: [np.array([-80, -80]), np.array([30, -80]), np.array([30, -80]), np.array([-80, -80])],
-        14: [np.array([8, -70]), np.array([8, 70]), np.array([8, -70]), np.array([8, 70])],
-        15: [np.array([-15, -15]), np.array([32, 32]), np.array([32, 32]), np.array([-15, -15])],
-        16: [np.array([-15, 132]), np.array([14, 14]), np.array([14, 14]), np.array([-15, 132])],
-        17: [np.array([4, 18]), np.array([4, 46]), np.array([4, 46]), np.array([4, 43])],
-        18: [np.array([6, -17]), np.array([8, -17]), np.array([33, -17]), np.array([6, -17])],
-        19: [np.array([3, 18]), np.array([15, 1]), np.array([27, -16]), np.array([3, 18])],
-        20: [np.array([-1, -1]), np.array([8, 8]), np.array([-1, -1]), np.array([101, 101])]
+        9: [Point(-1, 1), Point(3, 1), Point(1, 1), Point(5, 1)],
+        10: [Point(-2, -2), Point(-2, 6), Point(-2, 3), Point(-2, 10)],
+        11: [Point(1, 1), Point(5, 5), Point(3, 3), Point(7, 7)],
+        12: [Point(10, -10), Point(1, -1), Point(-5, 5), Point(5, -5)],
+        13: [Point(-80, -80), Point(30, -80), Point(30, -80), Point(-80, -80)],
+        14: [Point(8, -70), Point(8, 70), Point(8, -70), Point(8, 70)],
+        15: [Point(-15, -15), Point(32, 32), Point(32, 32), Point(-15, -15)],
+        16: [Point(-15, 132), Point(14, 14), Point(14, 14), Point(-15, 132)],
+        17: [Point(4, 18), Point(4, 46), Point(4, 46), Point(4, 43)],
+        18: [Point(6, -17), Point(8, -17), Point(33, -17), Point(6, -17)],
+        19: [Point(3, 18), Point(15, 1), Point(27, -16), Point(3, 18)],
+        20: [Point(-1, -1), Point(8, 8), Point(-1, -1), Point(101, 101)]
     }.get(id)
