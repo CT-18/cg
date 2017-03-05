@@ -121,6 +121,7 @@ def points(trapezoid):
 tmap = None
 left_point = None
 figure = None
+chosen_point = None
 
 
 def interactive_example():
@@ -128,7 +129,8 @@ def interactive_example():
     tmap = TrapezoidMap()
     left_point = None
     figure = plt.figure(num=' ', figsize=(12, 5), dpi=65)
-    cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
+    plt.gcf().canvas.mpl_connect('button_press_event', on_click)
+    plt.gcf().canvas.mpl_connect('motion_notify_event', on_move)
     plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
     plt.axis('off')
     plt.margins(0.01)
@@ -142,7 +144,7 @@ def find_nearest_point(x, y):
     for segment in tmap.segments:
         dx = int(abs(x - segment.p.coord[0]))
         dy = int(abs(y - segment.p.coord[1]))
-        dist = math.sqrt(dx*dx + dy*dy)
+        dist = math.sqrt(dx * dx + dy * dy)
         if dist < 10.0:
             minx = segment.p.coord[0]
             miny = segment.p.coord[1]
@@ -157,7 +159,7 @@ def find_nearest_point(x, y):
     return Point(int(minx), int(miny))
 
 
-def OnClick(event):
+def on_click(event):
     global left_point, tmap
     if not event.dblclick:
         if left_point is None:
@@ -186,3 +188,22 @@ def OnClick(event):
             plt.plot(left_point.coord[0], left_point.coord[1], 'ro')
             plt.plot(right_point.coord[0], right_point.coord[1], 'ro')
             left_point = None
+
+
+def on_move(event):
+    global chosen_point
+    if event.xdata is None:
+        return
+    x = int(round(event.xdata))
+    y = int(round(event.ydata))
+    mouse_point = Point(x, y)
+    nearest_point = find_nearest_point(x, y)
+    if mouse_point == nearest_point:
+        if chosen_point is not None:
+            try:
+                chosen_point.remove()
+            except ValueError:
+                pass
+            chosen_point = None
+    elif chosen_point is None:
+            chosen_point, = plt.plot(nearest_point.coord[0], nearest_point.coord[1], 'co')
