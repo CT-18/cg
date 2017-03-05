@@ -12,7 +12,7 @@ class Segment:
 
     def __init__(self, p: Point, q: Point):
         # Точки p и q упорядочены лексикографически"
-        assert p.__lt__(q)
+        assert p < q
         self.p = p  # Левая точка
         self.q = q  # Правая точка
 
@@ -66,10 +66,7 @@ class XNode(AbstractNode):
 
     def visit(self, s):
         # Порядок обхода задается лексикографическим сравнением точек
-        if s.p.__lt__(self.point):
-            return self.left.visit(s)
-        else:
-            return self.right.visit(s)
+        return self.left.visit(s) if s.p < self.point else self.right.visit(s)
 
     __name__ = 'XNode'
 
@@ -84,21 +81,16 @@ class YNode(AbstractNode):
     def visit(self, s):
         # Порядок обхода задает предикат поворота
         sign = turn(s.p, self.segment.p, self.segment.q)
-        if sign == 1:
-            return self.left.visit(s)
-        elif sign == -1:
-            return self.right.visit(s)
+        if sign != 0:
+            return self.left.visit(s) if sign == 1 else self.right.visit(s)
         else:
             # У отрезков общая левая точка, надо проверить поворот по правой точке отрезка
-            assert self.segment.p.__eq__(s.p)
-            assert not self.segment.q.__eq__(s.q)
+            assert self.segment.p == s.p
+            assert not self.segment.q == s.q
             sign = turn(s.q, self.segment.p, self.segment.q)
-            if sign == 1:
-                return self.left.visit(s)
-            elif sign == -1:
-                return self.right.visit(s)
-            else:
+            if sign == 0:
                 raise Exception('Error')
+            return self.left.visit(s) if sign == 1 else self.right.visit(s)
 
     __name__ = 'YNode'
 

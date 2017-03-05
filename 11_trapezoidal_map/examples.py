@@ -127,7 +127,7 @@ def interactive_example():
     global left_point, tmap, figure
     tmap = TrapezoidMap()
     left_point = None
-    figure = plt.figure(num=1, figsize=(12, 5), dpi=65)
+    figure = plt.figure(num=' ', figsize=(12, 5), dpi=65)
     cid_up = plt.gcf().canvas.mpl_connect('button_press_event', OnClick)
     plt.plot([0, 0, 500, 500, 0], [0, 500, 500, 0, 0], 'g--')
     plt.axis('off')
@@ -165,7 +165,7 @@ def OnClick(event):
             plt.plot(left_point.coord[0], left_point.coord[1], 'ro')
         else:
             right_point = find_nearest_point(int(round(event.xdata)), int(round(event.ydata)))
-            if (right_point.__lt__(left_point)):
+            if right_point < left_point:
                 left_point, right_point = right_point, left_point
             seg = Segment(left_point, right_point)
             insert(tmap, seg)

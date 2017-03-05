@@ -10,14 +10,14 @@ def segment_equal(s0, s1):
     elif s1 is None:
         return False
     else:
-        return s0.p.__eq__(s1.p) and s0.q.__eq__(s1.q)
+        return s0.p == s1.p and s0.q == s1.q
 
 
 def data_equal(tr0, tr1):
     # Проверка на то, совпадают ли точки и отрезки трапецоидов
-    if not tr0.leftp.__eq__(tr1.leftp):
+    if tr0.leftp != tr1.leftp:
         return False
-    if not tr0.rightp.__eq__(tr1.rightp):
+    if tr0.rightp != tr1.rightp:
         return False
     if segment_equal(tr0.top, tr1.top):
         if segment_equal(tr0.bottom, tr1.bottom):
@@ -58,7 +58,7 @@ def node_equal(n0, n1):
             return False
         return trapezoid_equal(n0.tr, n1.tr)
     if n0.__name__ == XNode.__name__:
-        if not n0.point.__eq__(n1.point):
+        if n0.point != n1.point:
             return False
     elif n0.__name__ == YNode.__name__:
         if not segment_equal(n0.segment, n1.segment):
@@ -92,7 +92,7 @@ def build_tmap():
         p2 = int(pair[1]) - 1
         p = Point(point_list[p1][0], point_list[p1][1])
         q = Point(point_list[p2][0], point_list[p2][1])
-        if q.__lt__(p):
+        if q < p:
             p, q = q, p
         solution.insert(tmap, Segment(p, q))
         i += 1
