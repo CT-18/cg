@@ -1,11 +1,17 @@
 import matplotlib.pyplot as plt
+from enum import Enum
+
+class Relation(Enum):
+    CONTAINS = 1
+    INTERSECTS = 2
+    DOES_NOT_INTERSECT = 3
 
 def solve(s, i):
     if i[0] < s[0] and s[1] <= i[1]:
-        return 'contains'
+        return Relation.CONTAINS
     if s[0] <= i[1] and i[0] < s[1]:
-        return 'intersects'
-    return 'does not intersect'
+        return Relation.INTERSECTS
+    return Relation.DOES_NOT_INTERSECT
 
 def show_ex(s, i):
     plt.axis([0, 9, 0, 4])
@@ -19,7 +25,7 @@ def show_ex(s, i):
 def show_error(s, i, res):
     print('Неправильный ответ!!!')
     print('Ваш ответ на входных данных seg={}, int={}: {}'.format(s, i, res))
-    print('Не обращайте внимания на ось Оу. Она приведена только для наглядности.')
+    print('Ось Оу не участвует в вычислениях, она приведена только для наглядности.')
     show_ex(s, i)
     
 def test(relation):

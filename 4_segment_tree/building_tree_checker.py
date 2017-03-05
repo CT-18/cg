@@ -88,7 +88,7 @@ def test(test_building):
     failed = False
     for i in range(len(gr[0])):
         if get_node_name(gr[0][i]) != get_node_name(gr[1][i]):
-            print('К сожалению вам алгоритм неправильный!\nПосмотрите посмотрите ошибку на рисунке и попробуйте снова.')
+            print('К сожалению, ваш алгоритм неправильный!\nПосмотрите ошибку на рисунке и попробуйте снова.')
             failed = True
             break
 

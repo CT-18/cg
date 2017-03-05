@@ -155,10 +155,15 @@ def visual_dump_holes_merging(args, D, holes, filename):
         plt.plot(xs, ys, 'g--')
 
     def draw_triangle(args):
-        for i in range(3):
-            xs = [args['triangle'][i].x, args['triangle'][(i + 1) % 3].x]
-            ys = [args['triangle'][i].y, args['triangle'][(i + 1) % 3].y]
-            plt.plot(xs,ys,'m--')
+        xs = [args['triangle'][0].x, args['triangle'][1][0]]
+        ys = [args['triangle'][0].y, args['triangle'][1][1]]
+        plt.plot(xs,ys,'m--')
+        xs = [args['triangle'][1][0], args['triangle'][2].x]
+        ys = [args['triangle'][1][1], args['triangle'][2].y]
+        plt.plot(xs,ys,'m--')
+        xs = [args['triangle'][2].x, args['triangle'][0][0]]
+        ys = [args['triangle'][2].y, args['triangle'][0][1]]
+        plt.plot(xs,ys,'m--')
 
     for h in D:
         xs = [h.origin.x, h.twin.origin.x]
