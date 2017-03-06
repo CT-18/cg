@@ -36,13 +36,13 @@ def generatePoints(n, N):
         
 # Визуализотор построения kd-дерева на заданных точках
 def kd_tree_visualize_build(points):
-    fig = plt.figure(figsize=(6, 6))
-    ax1 = plt.subplot(111, aspect='equal')
+    fig = plt.figure(figsize=(6, 6), num=' ')
+    ax = plt.subplot(111, aspect='equal')
     steps = countSteps(points, 0) 
     p = np.array(points)
-    ax1.plot(p[:, 0], p[:, 1], 'o', color='red')
-    ax1.set_xlim(0, 20)
-    ax1.set_ylim(0, 20)
+    ax.plot(p[:, 0], p[:, 1], 'o', color='red')
+    ax.set_xlim(0, 20)
+    ax.set_ylim(0, 20)
     
     # Построение дерева до steps шагов, [left, right, floor, ceil] - текущая область, которую мы рассматриваем
     # i == 0 на этом шаге добавляем вертикальную прямую, иначе горизонтальную
@@ -68,9 +68,9 @@ def kd_tree_visualize_build(points):
             
         if (len(A) + len(B) >= 2):
             if (i == 0):
-                ax1.plot([mean, mean], [floor, ceil], color=col, linestyle='-', linewidth=1)
+                ax.plot([mean, mean], [floor, ceil], color=col, linestyle='-', linewidth=1)
             else:
-                ax1.plot([left, right], [mean, mean], color=col, linestyle='-', linewidth=1)
+                ax.plot([left, right], [mean, mean], color=col, linestyle='-', linewidth=1)
             
         if (len(A) <= 1 and len(B) <= 1):
             return 1
@@ -83,12 +83,12 @@ def kd_tree_visualize_build(points):
                 printStep(B, (i + 1) % 2, steps - 1, left, right, mean, ceil)
     
     def changeStep(step = 0):
-        ax1.clear() 
+        ax.clear() 
         printStep(points, 0, step, 0, 20, 0, 20)
         p = np.array(points)
-        ax1.plot(p[:, 0], p[:, 1], 'o', color='red')
-        ax1.set_xlim(0, 20)
-        ax1.set_ylim(0, 20)
+        ax.plot(p[:, 0], p[:, 1], 'o', color='red')
+        ax.set_xlim(0, 20)
+        ax.set_ylim(0, 20)
         display(fig)
     
     display(interactive(changeStep, step=(0, steps)))
@@ -115,7 +115,7 @@ def intersect(a, b):
     return True
     
 def kd_tree_search_visualize(box, points):
-    fig1 = plt.figure(figsize=(6, 6))
+    fig1 = plt.figure(figsize=(6, 6), num='  ')
     ax1 = plt.subplot(111, aspect='equal')
     p = np.array(points)
     ax1.plot(p[:, 0], p[:, 1], 'o', color='red')
