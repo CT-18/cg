@@ -1,4 +1,4 @@
-import binary_search_tree
+import range_tree
 
 from random import randint
 
@@ -19,7 +19,7 @@ def generateTest():
     return points
 
 def buildTree(points):
-    tree = binary_search_tree.BinarySearchTree()
+    tree = range_tree.RangeTree()
 
     orderedPoints = []
     xValues = []
@@ -37,7 +37,7 @@ def buildTree(points):
     return tree
 
 def buildInnerTree(values):
-    tree = binary_search_tree.BinarySearchTree()
+    tree = range_tree.RangeTree()
 
     for val in values:
         tree.insert(val)

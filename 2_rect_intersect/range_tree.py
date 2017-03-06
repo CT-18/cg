@@ -6,11 +6,11 @@ class TreeNode:
         self.value = value
 
 class InnerTree:
-    def __init__(self, value, binaryTree):
+    def __init__(self, value, rangeTree):
         self.value = value
-        self.binaryTree = binaryTree
+        self.rangeTree = rangeTree 
 
-class BinarySearchTree:
+class RangeTree:
     def __init__(self):
         self.root = None
         self.size = 0
