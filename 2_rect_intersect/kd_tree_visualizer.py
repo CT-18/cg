@@ -5,91 +5,76 @@ import numpy as np
 from ipywidgets import interact, interactive, IntSlider
 from IPython.display import display
 from random import random
+from cg.utils import *
 
 # подсчет глубины kd-дерева
-def countSteps(points, i):
-    if (len(points) == 0):
-        return 0;
-    p = np.array(points)
-    mean = np.mean(p[:, i])
+def countSteps(points, axis):
+    if (len(points) <= 2):
+        return 1;
     
-    A = list()
-    B = list()
+    sorted_points = points.sort(lambda first, second: first[axis] - second[axis], False)
+    mean = len(points) // 2
+    
+    return max(countSteps(sorted_points[:mean], (axis + 1) % 2), countSteps(sorted_points[mean:], (axis + 1) % 2)) + 1;
 
-    for p in points:
-        if (p[i] < mean):
-            A.append(p)
-        else:
-            B.append(p)
-
-    if (len(A) <= 1 and len(B) <= 1):
-        return 1
-    else: 
-        return max(countSteps(A, (i + 1) % 2), countSteps(B, (i + 1) % 2)) + 1;
-
-# Генератор N точек с координатами (0..n)
-def generatePoints(n, N):
-    points = {(randint(0, n), randint(0, n)) for i in range(N)}
-    while len(points) < N:
-        points |= {(randint(0, n), randint(0, n))}
-    return list(list(x) for x in points)
-        
 # Визуализотор построения kd-дерева на заданных точках
 def kd_tree_visualize_build(points):
+    
     fig = plt.figure(figsize=(6, 6), num=' ')
     ax = plt.subplot(111, aspect='equal')
-    steps = countSteps(points, 0) 
-    p = np.array(points)
-    ax.plot(p[:, 0], p[:, 1], 'o', color='red')
+    ax.plot(points.points[:, 0], points.points[:, 1], 'o', color='red')
+    max_point = points.max()
+    min_point = points.max(lambda f,s : -cmp_(f, s))
+    #ax.set_xlim(min_point[0], max_point[0])
+    #ax.set_ylim(min_point[1], max_point[1])
     ax.set_xlim(0, 20)
     ax.set_ylim(0, 20)
+
+    steps = countSteps(points, 0) 
     
     # Построение дерева до steps шагов, [left, right, floor, ceil] - текущая область, которую мы рассматриваем
     # i == 0 на этом шаге добавляем вертикальную прямую, иначе горизонтальную
-    def printStep(points, i, steps, left, right, floor, ceil):
+    def printStep(points, axis, steps, left, right, floor, ceil):
         if (len(points) == 0 or steps == -1):
             return;
-        p = np.array(points)
-        mean = np.mean(p[:, i])
-   
-        A = list()
-        B = list()
-
-        for p in points:
-            if (p[i] < mean):
-                A.append(p)
-            else:
-                B.append(p)
-
+  
+        sorted_points = points.sort(lambda first, second: first[axis] - second[axis], False)
+        mean = len(points) // 2
+        mean_val = sorted_points[mean][axis]
+        
         if (steps == 0):
             col = 'r'
         else:
             col = 'k'
             
-        if (len(A) + len(B) >= 2):
-            if (i == 0):
-                ax.plot([mean, mean], [floor, ceil], color=col, linestyle='-', linewidth=1)
+        if (len(points) >= 2):
+            if (axis == 0):
+                ax.plot([mean_val, mean_val], [floor, ceil], color=col, linestyle='-', linewidth=1)
             else:
-                ax.plot([left, right], [mean, mean], color=col, linestyle='-', linewidth=1)
+                ax.plot([left, right], [mean_val, mean_val], color=col, linestyle='-', linewidth=1)
             
-        if (len(A) <= 1 and len(B) <= 1):
-            return 1
+        if (len(points) <= 2):
+            return 
         else: 
-            if (i == 0):
-                printStep(A, (i + 1) % 2, steps - 1, left, mean, floor, ceil)
-                printStep(B, (i + 1) % 2, steps - 1, mean, right, floor, ceil)
+            if (axis == 0):
+                printStep(sorted_points[:mean], (axis + 1) % 2, steps - 1, left, mean_val, floor, ceil)
+                printStep(sorted_points[mean:], (axis + 1) % 2, steps - 1, mean_val, right, floor, ceil)
             else:
-                printStep(A, (i + 1) % 2, steps - 1, left, right, floor, mean)
-                printStep(B, (i + 1) % 2, steps - 1, left, right, mean, ceil)
+                printStep(sorted_points[:mean], (axis + 1) % 2, steps - 1, left, right, floor, mean_val)
+                printStep(sorted_points[mean:], (axis + 1) % 2, steps - 1, left, right, mean_val, ceil)
     
     def changeStep(step = 0):
         ax.clear() 
         printStep(points, 0, step, 0, 20, 0, 20)
-        p = np.array(points)
-        ax.plot(p[:, 0], p[:, 1], 'o', color='red')
+        ax.plot(points.points[:, 0], points.points[:, 1], 'o', color='red')
         ax.set_xlim(0, 20)
         ax.set_ylim(0, 20)
+        #ax.set_xlim(min_point[0], max_point[0])
+        #ax.set_ylim(min_point[1], max_point[1])
         display(fig)
+        print(points)
+        print(max_point)
+        print(min_point)
     
     display(interactive(changeStep, step=(0, steps)))
 
