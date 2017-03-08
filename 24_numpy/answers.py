@@ -26,7 +26,7 @@ def check_task1(task1):
     if task1() == task1_ans():
         print("Great work")
     else:
-        print("You are so stupid, try again")
+        print("WRONG, try again!")
 
 def check_task2(task2):
     img = np.array([[1, 2],
@@ -40,7 +40,7 @@ def check_task2(task2):
     if test_task2_impl(img, t, task2) and test_task2_impl(img2, t2, task2):
         print("Oh yes man!")
     else:
-        print("Are you kidding me? - It's very simple!")
+        print("WRONG, try again!")
 
 def check_task3(task3):
     img = np.array([[-100,  0,   1, 255, 256, 257],
@@ -54,7 +54,7 @@ def check_task3(task3):
         if np.array_equal(exp, given):
             print("Best of the best")
         else:
-            print("Othcislen!")
+            print("WRONG, try again!")
             print("origin:  ", img)
             print("expected:", exp)
             print("given:   ", given)
