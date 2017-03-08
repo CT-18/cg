@@ -59,7 +59,7 @@ def check_task3(task3):
             print("expected:", exp)
             print("given:   ", given)
     else:
-        print("You return not ndarray.")
+        print("You have returned not a ndarray.")
 
 def test_task2_impl(img, t, task2):
     o_img = img.copy()
@@ -70,7 +70,7 @@ def test_task2_impl(img, t, task2):
         if np.array_equal(img, o_img):
             return True
         else:
-            print("Oh no you corrupt source image !!! =(")
+            print("Oh no you have corrupted source image !!! =(")
 
     else:
         print("img:", img)
