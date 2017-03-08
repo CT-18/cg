@@ -5,7 +5,7 @@ def test(id):
     return {
         1: [Point(1, 1), Point(3, 3), Point(3, 3), Point(3, 2), Point(-6, -6, -2)],
         2: [Point(1, 1), Point(4, 5), Point(2, 1), Point(2, 5), Point(24, 28, 12)],
-        3: [Point(-18, -34), Point(62, 15), Point(83, 7), Point(-8, 16), Point(277978, 51274, 0)],
+        3: [Point(-18, -34), Point(62, 15), Point(83, 7), Point(-8, 16), Point(277978, 51274, 5179)],
         4: [Point(0, 0), Point(1, 4), Point(2, 2), Point(0, 3), Point(6, 24, 9)],
         5: [Point(0, 0), Point(7, 1), Point(0, 1), Point(7, 0), Point(-49, -7, -14)],
         6: [Point(1, 2), Point(4, 2), Point(4, 2), Point(7, 2), Point(4, 2, 1)],

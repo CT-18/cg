@@ -43,7 +43,8 @@ def check_first_exercise(plt, get_intersection_point):
             print("Test", i, "Ok")
         else:
             print("Test", i, "Failed:")
-            print("\t", answ, "expected but", output, "found")
+            print("\tx={}, y={}, det={}".format(answ.x, answ.y, answ.det), "expected but\n", 
+                  "\tx={}, y={}, det={}".format(output.x, output.y, output.det), "found")
     print("Part 2. Overlap tests")
     for i in range(9, 21):
         a, b, c, d = test(i)
