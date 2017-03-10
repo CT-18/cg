@@ -1,10 +1,5 @@
 import numpy as np
-from cg import Point  # , turn
-
-
-def turn(q, x, y):
-    return np.sign(
-        np.linalg.det(np.array([[x.coord[0], x.coord[1]], [y.coord[0], y.coord[1]]]) - [q.coord[0], q.coord[1]]))
+from cg import Point , turn
 
 
 class Segment:

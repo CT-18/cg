@@ -1,14 +1,8 @@
 from TMapClasses import *
 
 import numpy as np
-from cg import Point  # , turn
+from cg import Point, turn
 from enum import Enum
-
-
-# Убрать после фикса cg_common/issues/10
-def turn(q, x, y):
-    return np.sign(
-        np.linalg.det(np.array([[x.coord[0], x.coord[1]], [y.coord[0], y.coord[1]]]) - [q.coord[0], q.coord[1]]))
 
 
 def intersect_segment(s: Segment, left_tr: Trapezoid):

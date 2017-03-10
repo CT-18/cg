@@ -1,37 +1,11 @@
 <style>
 details#custom  summary{
-	cursor: pointer; 
+    cursor: pointer; 
 }
 details#custom  summary span{
-	cursor: pointer; 
-	border-bottom: 1px dashed #000080; 
-	border-color: #00f; 
-	color: #00f; 
-}
-
-details#theorem summary::-webkit-details-marker {
-	display: none; 
-}
-
-details#theorem summary{
-	cursor: pointer; 
-	font: bold 1em Arial, Helvetica, sans-serif; 
-}
-
-details#theorem summary:after {
-	content: "\25B7\25C1"; 
-	float: left; 
-	font-size: 200%; 
-	width: 100%; 
-	height: 100%; 
-}
-
-details#theorem[open]:after {
-	content: "\25C1"; 
-	font: bold 1em Arial, Helvetica, sans-serif; 
-	font-size: 200%; 
-}
-details#theorem[open] summary:after{
-	content: "\25B7"
+    cursor: pointer; 
+    border-bottom: 1px dashed #000080; 
+    border-color: #00f; 
+    color: #00f; 
 }
 </style>
