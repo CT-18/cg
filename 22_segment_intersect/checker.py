@@ -7,7 +7,7 @@ import Bentley_Ottmann_tests
 
 def check_first_exercise(plt, get_intersection_point):
     test = exercise_1_tests.test
-    
+
     def calculate_det(a, b):
         return a.x * b.y - b.x * a.y
 
@@ -43,7 +43,7 @@ def check_first_exercise(plt, get_intersection_point):
             print("Test", i, "Ok")
         else:
             print("Test", i, "Failed:")
-            print("\tx={}, y={}, det={}".format(answ.x, answ.y, answ.det), "expected but\n", 
+            print("\tx={}, y={}, det={}".format(answ.x, answ.y, answ.det), "expected but\n",
                   "\tx={}, y={}, det={}".format(output.x, output.y, output.det), "found")
     print("Part 2. Overlap tests")
     for i in range(9, 21):
@@ -62,18 +62,27 @@ def check_first_exercise(plt, get_intersection_point):
 def check_Bentley_Ottmann_algorithm(plt, find_intersections):
     test = Bentley_Ottmann_tests.test
 
-    f, axes = plt.subplots(2, 3, figsize=(10, 6))
-    for i, axis in zip(range(1, 7), axes.reshape(6)):
+    f, axes = plt.subplots(2, 5, figsize=(12, 6))
+    for i, axis in zip(range(1, 11), axes.reshape(10)):
         axis.set_title("Test " + str(i))
         input = test(i)
         n = input[0]  # number of segments
         segments = []
-        for j in range(0, n):
-            x1, y1, x2, y2 = map(int, input[1][j].split())
-            s = Segment(Point(x1, y1), Point(x2, y2), j)
+        for j in range(0, 2 * n, 2):
+            p1, p2 = input[1][j], input[1][j + 1]
+            s = Segment(p1, p2, j)
             segments.append(s)
-            axis.plot([x1, x2], [y1, y2], c='black')
-            axis.scatter(x1, y1, c='black', s=30)
-            axis.scatter(x2, y2, c='black', s=30)
+            axis.plot([p1.x, p2.x], [p1.y, p2.y], c='black')
+            axis.scatter(p1.x, p1.y, c='black', s=30)
+            axis.scatter(p2.x, p2.y, c='black', s=30)
         intersection_points = find_intersections(segments)
-        # TODO: add comparison
+        intersection_points_answ = set()
+        intersection_points_answ.update(input[2])
+        if intersection_points == intersection_points_answ:
+            print("Test", i, "Ok")
+        else:
+            print("Test", i, "Fail:")
+            print("\t", intersection_points_answ, "expected but")
+            print("\t", intersection_points if len(intersection_points) > 0 else "{}", "found")
+
+    plt.show()

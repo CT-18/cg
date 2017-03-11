@@ -37,7 +37,7 @@ class Point:
         return hash(tuple([Fraction(self.x, self.det), Fraction(self.y, self.det)]))
 
     def __repr__(self):
-        return "(%r, %r)" % (Fraction(self.x, self.det), Fraction(self.y, self.det))
+        return "(%r, %r)" % (str(Fraction(self.x, self.det)), str(Fraction(self.y, self.det)))
 
 
 class Segment:
