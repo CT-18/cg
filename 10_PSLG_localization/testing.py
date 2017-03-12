@@ -1,13 +1,13 @@
-from test_utils import turn
+from cg import Point, turn
 
 triangles = [
-[(-2, 2), (3, 1), (-2, -4)],
-[(1, 3), (0, 0), (5, 2)],
-[(-5, 4), (5, 4), (0, -12)],
-[(-3, 1), (0, 2), (-3, 3)],
-[(-4, -1), (-1, -1), (-1, -2)],
-[(4, 5), (9, 5), (6, 2)],
-[(4, 3), (6, 6), (9, 3)]
+[Point(-2, 2), Point(3, 1), Point(-2, -4)],
+[Point(1, 3), Point(0, 0), Point(5, 2)],
+[Point(-5, 4), Point(5, 4), Point(0, -12)],
+[Point(-3, 1), Point(0, 2), Point(-3, 3)],
+[Point(-4, -1), Point(-1, -1), Point(-1, -2)],
+[Point(4, 5), Point(9, 5), Point(6, 2)],
+[Point(4, 3), Point(6, 6), Point(9, 3)]
 ]
 
 def overlap(a, b):
@@ -23,10 +23,10 @@ def intersect_segments(a, b):
         return False
     if turn(b[0], b[1], a[0]) * turn(b[0], b[1], a[1]) == 1:
         return False
-    x1, y1 = a[0]
-    x2, y2 = a[1]
-    x3, y3 = b[0]
-    x4, y4 = b[1]
+    x1, y1 = a[0].coord[0], a[0].coord[1]
+    x2, y2 = a[1].coord[0], a[1].coord[1]
+    x3, y3 = b[0].coord[0], b[0].coord[1]
+    x4, y4 = b[1].coord[0], b[1].coord[1]
 
     xx1 = [min(x1, x2), max(x1, x2)]
     xx2 = [min(x3, x4), max(x3, x4)]
