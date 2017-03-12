@@ -1,6 +1,6 @@
 from graphviz import Graph
 from IPython.display import IFrame
-
+import os
 
 n = 32
 last_level = n // 2 - 1 
@@ -43,17 +43,12 @@ def build_empty_interior_tree(gr, i, points):
         make_last_level_node(gr, i, points)
 
 def get_node_name(node):
-    s = ''
-    s += ('[' if node[2] else '(')
-    s += str(node[0]) + ':' + str(node[1])
-    s += (']' if node[3] else ')')
+    s = ''.join(['[' if node[2] else '(', str(node[0]), ':', str(node[1]), ']' if node[3] else ')'])
     return s
 
 def show_tree(gr):
     g = Graph('G', filename='tree')
-    import os
-    if 'out' not in os.listdir():
-        os.mkdir('out')
+    os.makedirs('out', exist_ok = True)
     for i in range(len(gr[0]) - 1):
         color = 'green1'
         if get_node_name(gr[0][i]) != get_node_name(gr[1][i]):
@@ -69,9 +64,7 @@ def show_tree(gr):
             g.edge(str(i), str(l))
         if r < len(gr[0]):
             g.edge(str(i), str(r))
-    #g.view()
     g.render('out/tree')
-    #IFrame("tree.pdf", width=900, height=400)
     
 def gen_problem():
     t = [new_node for i in range(n - 1)] 

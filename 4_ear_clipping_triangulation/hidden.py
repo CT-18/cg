@@ -1,9 +1,6 @@
 from enum import Enum
 from cg import Point
 
-#import matplotlib.pyplot as plt
-def point_comp_lex(self, other):
-    return self.coord[0] < other.coord[0] or (self.coord[0] == other.coord[0] and self.coord[1] < other.coord[1])
 
 class VType(Enum):
     start = 1
@@ -14,25 +11,6 @@ class VType(Enum):
 
 def turn(v1, v2, v3):
     return (v2.x - v1.x) * (v3.y - v1.y) - (v3.x - v1.x) * (v2.y - v1.y)
-
-#    class Vertex:
-#        """
-#        Класс точки с компаратором, подходящим для нашей задачи
-#        """
-#        def __init__(self, px, py):
-#            self.x = px
-#            self.y = py
-#            self.hedge = None
-#            self.vtype = None
-#        
-#        def __lt__(self, other):
-#            return self.y > other.y or (self.y == other.y and self.x < other.x)
-#        
-#        def __eq__(self, other):
-#            return self.x == other.x and self.y == other.y
-#
-#        def __repr__(self):
-#            return '({0};{1})'.format(self.x,self.y)
 
     
 class Hedge:
