@@ -104,6 +104,7 @@ def test_comparator(comp):
 class Vertex:
 
     def __init__(self):
+        self.version = None
         self.left = None
         self.right = None
         self.next = None
@@ -133,8 +134,9 @@ class Slabs:
         n = int(fin.readline().rstrip())
         vertices = [Vertex() for i in range(n)]
         for i in range(n):
-            edge, left, right, next2, direction = fin.readline().rstrip().split()
-            edge, left, right, next2 = int(edge), int(left), int(right), int(next2)
+            edge, left, right, next2, direction, version = fin.readline().rstrip().split()
+            edge, left, right, next2, version = int(edge), int(left), int(right), int(next2), int(version)
+            vertices[i].version = version
             vertices[i].edge = edges[edge - 1]
             if left != -1:
                 vertices[i].left = vertices[left]
