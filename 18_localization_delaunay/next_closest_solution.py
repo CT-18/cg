@@ -1,36 +1,83 @@
-from test_creator import *
+from cg import Point, Vertex, Face
 
-create_vertex(1, 0, 13)
-create_vertex(2, 3, 11)
-create_vertex(3, 7, 13)
-create_vertex(4, 8, 11)
-create_vertex(5, 10, 19)
-create_vertex(6, 10, 15)
-create_vertex(7, 13, 11)
-create_vertex(8, 16, 14)
-create_vertex(9, 14, 11)
-create_vertex(10, 15, 7)
+points = [
+    (0, 13),
+    (3, 11),
+    (7, 13),
+    (8, 11),
+    (10, 19),
+    (10, 15),
+    (13, 11),
+    (16, 14),
+    (14, 11),
+    (15, 7)
+]
+points = [Point.infinity(2)] + [Point(*args) for args in points]
+points = [Vertex(p, None) for p in points]
+for i, v in enumerate(points):
+    v.name = i
+points[0].name = "infinity"
 
-create_triangle(1, 3, 2)
-create_triangle(1, 5, 3)
-create_triangle(3, 5, 6)
-create_triangle(3, 6, 4)
-create_triangle(2, 3, 4)
-create_triangle(2, 4, 10)
-create_triangle(4, 6, 7)
-create_triangle(6, 5, 8)
-create_triangle(6, 8, 7)
-create_triangle(4, 7, 10)
-create_triangle(7, 8, 9)
-create_triangle(7, 9, 10)
-create_triangle(10, 9, 8)
+faces = [
+    [2, 3, 1],
+    [3, 5, 1],
+    [6, 5, 3],
+    [4, 6, 3],
+    [4, 3, 2],
+    [10, 4, 2],
+    [7, 6, 4],
+    [8, 5, 6],
+    [7, 8, 6],
+    [10, 7, 4],
+    [9, 8, 7],
+    [10, 9, 7],
+    [8, 9, 10],
+    [1, 5, 0],#13
+    [5, 8, 0],#14
+    [8, 10, 0],#15
+    [10, 2, 0],#16
+    [2, 1, 0]#17
+]
 
-claim_border([10, 8, 5, 1, 2])
-update_neighbours()
+res_faces = []
+for i, j, k in faces:
+    res_faces.append(Face([points[i], points[j], points[k]], None))
+    res_faces[-1].name = "({}, {}, {})".format(points[i].name, points[j].name, points[k].name)
+faces = res_faces
 
-q = vertex("q", 14, 13)
-vprev = vertices[1]
-vnext = vertices[9]
+connections = [0, 0, 0, 0, 3, 2, 2, 6, 8, 12, 12]
+for i, v in enumerate(points):
+    v.face = faces[connections[i]]
+    
+neighbours = [
+    [1, 17, 4],
+    [13, 0, 2],
+    [1, 3, 7],
+    [2, 4, 6],
+    [0, 5, 3],
+    [4, 16, 9],
+    [3, 9, 8],
+    [2, 8, 14],
+    [7, 6, 10],
+    [6, 5, 11],
+    [8, 11, 12],
+    [10, 9, 12],
+    [11, 15, 10],
+    [14, 17, 1],
+    [15, 13, 7],
+    [16, 14, 12],
+    [17, 15, 5],
+    [13, 16, 0]
+]
+for f, (i, j, k) in zip(faces, neighbours):
+    f.neighbours = [faces[i], faces[j], faces[k]]
+
+#============================================================
+
+q = Point(14, 13)
+q.name = "q"
+vprev = points[1]
+vnext = points[9]
 
 test = (q, vprev)
 

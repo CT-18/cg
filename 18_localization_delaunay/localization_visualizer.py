@@ -92,10 +92,10 @@ def onRelease(event):
     redrawClosest(q, points, ax1)
     display(fig)
 
-def changeLevel(r = 0):
+def changeLevel(уровень = 0):
     if changeLevel.suspend:
         return
-    printLevel(fig, ax1, q, levels, r)
+    printLevel(fig, ax1, q, levels, уровень)
 changeLevel.suspend = True
 
 def visualize():
@@ -117,5 +117,5 @@ def visualize():
     #ax1.text(2, 2, len(levels))
     
     changeLevel.suspend = False
-    display(interactive(changeLevel, r=(0, len(levels) - 1)))
+    display(interactive(changeLevel, уровень=(0, len(levels) - 1)))
     printLevel(fig, ax1, q, levels, 0, redraw = False)
