@@ -1,0 +1,19 @@
+digraph G {
+  rankdir="LR"
+  node [shape="box", style="filled", fillcolor="green", fontcolor="black"];
+
+  "5"[fillcolor="red"]
+  "6"[fillcolor="yellow"]
+  "3'"[fillcolor="yellow"]
+
+/*  subgraph three {
+      "3"
+      "3'"[fillcolor="yellow"]
+  }
+*/
+  "1" -> "2" -> "3" -> "4"[label="next"]
+  "5" -> "4"[label="next"]
+  "3" -> "5"[label="next2"]
+  "3'" -> "6" -> "5"[label="next"]
+  "2" -> "3'"[label="next2"]
+}
