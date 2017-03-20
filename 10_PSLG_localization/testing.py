@@ -1,4 +1,5 @@
 from cg import Point, turn
+import itertools as itertools
 
 triangles = [
 [Point(-2, 2), Point(3, 1), Point(-2, -4)],
@@ -53,14 +54,12 @@ def intersect(a, b):
         if is_inside(a, v):
             return True
 
-    for u in a:
-        for v in a:
-            if u != v:
-                for p in b:
-                    for q in b:
-                        if p != q:
-                            if intersect_segments([u, v], [p, q]):
-                                return True
+    for u, v in itertools.product(a, a):
+        if u != v:
+            for p, q in itertools.product(b, b):
+                if p != q:
+                    if intersect_segments([u, v], [p, q]):
+                        return True
     return False
 
 
