@@ -66,8 +66,15 @@ def convert_edge(edge):
 
 
 def correct_comparator(a, b):
-    if turn(a[0], a[1], b[0]) * turn(a[0], a[1], b[1]) == 1:
+    first = turn(a[0], a[1], b[0])
+    second = turn(a[0], a[1], b[1])
+    if first * second == 1:
         if turn(a[0], a[1], b[0]) < 0:
+            return True
+        else:
+            return False
+    elif first * second == 0:
+        if first < 0 or second < 0:
             return True
         else:
             return False
