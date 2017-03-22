@@ -260,7 +260,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="0.9523807"
-     inkscape:cx="144.40445"
+     inkscape:cx="233.65447"
      inkscape:cy="192.51989"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -304,10 +304,10 @@
            y="68.042496" /></flowRegion><flowPara
          id="flowPara35816" /></flowRoot>    <path
        style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:2.27170253;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;marker-start:url(#InfiniteLineStart);marker-mid:url(#StopL);marker-end:url(#InfiniteLineEnd)"
-       d="m -1015.6833,1176.2517 61.62851,0 15.45863,0 67.31819,0 14.2456,0 68.62145,0 14.61651,0 75.41845,0 17.17791,0 78.95727,0 14.24559,0 86.87221,0 15,0 80.50023,0"
+       d="m -1015.6833,1176.2517 144.40533,0 14.2456,0 c 55.57094,0 101.94759,0 158.65641,0 l 17.17791,0 c 62.94658,0 115.74685,0 180.07507,0 l 15,0 80.50023,0"
        id="path35916"
        inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cccccccccccccc" />
+       sodipodi:nodetypes="cccccccc" />
     <ellipse
        style="opacity:1;fill:none;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="path35920"
