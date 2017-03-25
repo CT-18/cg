@@ -1,9 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
+from cg import *
 
-def example_pred(A0, A1, B0, B1) :
-    return np.sign(np.linalg.det(np.array([A1 - A0,B1 - B0])))
+def example_pred(A0:Point, A1:Point, B0:Point, B1:Point):
+    A = A1 - A0
+    B = B1 - B0
+    return np.sign(A[0]*B[1] - A[1]*B[0])
 
 def paint_point(this_plt, point, color):
     this_plt.plot(point[0], point[1], color)
@@ -47,40 +50,42 @@ def check_pred(pred_to_check):
     print("Предикат реализован правильно")
 
 def rand_figure():
-    A_ch = ConvexHull(np.random.uniform(1, 9, size=(10, 2)))
+    A_ch = ConvexHull(np.random.randint(1, 9, size=(10, 2)))
     ans = []
     for i in A_ch.vertices:
-        ans.append(A_ch.points[i])
+        p = Point(int(A_ch.points[i][0]), int(A_ch.points[i][1]))
+        ans.append(p)
+    ans = PointSet(ans)
     return ans
+#2 случайных выпуклых многоугольника
+A = rand_figure()
+B = rand_figure()
     
 def paint_polygon(figure, place, Q, color1, color2, min_val, max_val):
     plt1 = figure.add_subplot(place)
-    X, Y = np.transpose(Q)
     i = 0
     while i < len(Q):
-        next_i = (i + 1) % len(Q) 
-        plt1.plot([X[i], X[next_i]],[Y[i], Y[next_i]], color1, X[i], Y[i], color2) 
+        next_i = (i + 1) % len(Q)
+        A = Q[i]
+        B = Q[next_i]
+        plt1.plot([A[0], B[0]],[A[1], B[1]], color1, A[0], A[1], color2) 
         i += 1
     plt1.axis([min_val, max_val, min_val, max_val])
     
         
 def exapmle_find_first(A):
-    X, Y = np.transpose(A)
-    i = np.argmin(X)
-    while (Y[i] >= Y[(i + 1) % len(X)]) and ((X[i] >= X[(i + 1) % len(X)])):
-        i += 1
-    return i
+    return A.argmax(lambda Q, W: Q[0] == W[0] if Q[1] > W[1] else Q[0] > W[0])
 
 def example_alg(A, B):
-    i_A = exapmle_find_first(A)
-    i_B = exapmle_find_first(B)
+    i_A = A.argmax(lambda q, w: q > w)
+    i_B = B.argmax(lambda q, w: q > w)
     first_i_A = i_A
     first_i_B = i_B
     C = [A[i_A] + B[i_B]]
     i = 0;
     while (True):
         if (i > len(A) + len(B)):
-            print("Smth went wrong, check your array of points")
+            #print("Smth went wrong, check your array of points")
             break
         next_i_A = (i_A + 1) % len(A)
         next_i_B = (i_B + 1) % len(B)
@@ -97,6 +102,7 @@ def example_alg(A, B):
         C.append(A[i_A] + B[i_B])
         i += 1;
     return C
+
 
 def check_alg(alg_to_check):
     iterations = 100
