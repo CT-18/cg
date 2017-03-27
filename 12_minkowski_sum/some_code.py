@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 from cg import *
+from cg.point import PointSet 
 
 def example_pred(A0:Point, A1:Point, B0:Point, B1:Point):
     A = A1 - A0
@@ -57,9 +58,6 @@ def rand_figure():
         ans.append(p)
     ans = PointSet(ans)
     return ans
-#2 случайных выпуклых многоугольника
-A = rand_figure()
-B = rand_figure()
     
 def paint_polygon(figure, place, Q, color1, color2, min_val, max_val):
     plt1 = figure.add_subplot(place)
