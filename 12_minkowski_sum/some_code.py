@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 from cg import *
-from cg.point import PointSet 
 
 def example_pred(A0:Point, A1:Point, B0:Point, B1:Point):
     A = A1 - A0
