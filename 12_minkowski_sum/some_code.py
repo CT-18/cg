@@ -36,6 +36,7 @@ def check_pred(pred_to_check):
             list(map(lambda x, y: paint_point(new_plt, x, y), [A0, A1, B0, B1], ["ro", "yo", "bo", "go"]))
             #new_plt.plot([B0[0], B1[0]],[B0[1], B1[1]], "r")
             new_plt.axis([0, 5, 0, 5])
+            new_plt.set_title("vectors");
             new_plt = fig.add_subplot(122)
             new_plt.axis([-4, 4, -4, 4])
             A1 = A1 - A0
@@ -44,6 +45,7 @@ def check_pred(pred_to_check):
             A0 = A0 - A0
             list(map(lambda x, y, z: paint_line(new_plt, x, y, z), [A0, B0], [A1, B1], ["r", "b"]))
             list(map(lambda x, y: paint_point(new_plt, x, y), [A0, A1, B0, B1], ["ro", "yo", "bo", "go"]))
+            new_plt.set_title("shifted vectors");
             plt.show()
             return
         i += 1
@@ -58,7 +60,7 @@ def rand_figure():
     ans = PointSet(ans)
     return ans
     
-def paint_polygon(figure, place, Q, color1, color2, min_val, max_val):
+def paint_polygon(figure, place, Q, color1, color2, min_val, max_val, name):
     plt1 = figure.add_subplot(place)
     i = 0
     while i < len(Q):
@@ -67,6 +69,7 @@ def paint_polygon(figure, place, Q, color1, color2, min_val, max_val):
         B = Q[next_i]
         plt1.plot([A[0], B[0]],[A[1], B[1]], color1, A[0], A[1], color2) 
         i += 1
+    plt1.set_title(name)
     plt1.axis([min_val, max_val, min_val, max_val])
     
         
@@ -125,10 +128,10 @@ def check_alg(alg_to_check):
             print("C у вашего алгоритма(желтый)")
             print(C1)
             fig = plt.figure(figsize = (10, 10))
-            paint_polygon(fig, 221, A, "r", "yo", 0, 10)
-            paint_polygon(fig, 222, B, "g", "yo", 0, 10)
-            paint_polygon(fig, 223, C, "b", "yo", 0, 20)
-            paint_polygon(fig, 224, C1, "y", "ro", 0, 20) 
+            paint_polygon(fig, 221, A, "r", "yo", 0, 10, "A")
+            paint_polygon(fig, 222, B, "g", "yo", 0, 10, "B")
+            paint_polygon(fig, 223, C, "b", "yo", 0, 20, "C")
+            paint_polygon(fig, 224, C1, "y", "ro", 0, 20, "C1") 
             plt.show()
             return
         i += 1
