@@ -19,6 +19,14 @@
    sodipodi:docname="lemma_1.svg">
   <defs
      id="defs10380">
+    <linearGradient
+       id="linearGradient6947"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#1d4f26;stop-opacity:1;"
+         offset="0"
+         id="stop6949" />
+    </linearGradient>
     <marker
        inkscape:stockid="DotM"
        orient="auto"
@@ -1091,9 +1099,9 @@
      borderopacity="1.0"
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
-     inkscape:zoom="1.4142136"
-     inkscape:cx="-63.006491"
-     inkscape:cy="134.67744"
+     inkscape:zoom="2.8284271"
+     inkscape:cx="91.169585"
+     inkscape:cy="145.79886"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -1232,12 +1240,6 @@
          y="236.3707">w<tspan
    style="font-size:64.99999762%;baseline-shift:sub"
    id="tspan7101-06">i</tspan></tspan></text>
-    <path
-       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 1;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 662.51383,239.29666 -4.35637,42.00043"
-       id="path7134"
-       inkscape:connector-curvature="0"
-       sodipodi:nodetypes="cc" />
     <ellipse
        style="opacity:1;fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:#fa1e00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
        id="path7155"
@@ -1245,5 +1247,37 @@
        cy="283.46442"
        rx="2.5"
        ry="2.25" />
+    <path
+       style="opacity:0.41400003;fill:#34ff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 612.8514,216.40664 49.32453,20.62029 -4.89063,44.67186 z"
+       id="path4743"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
+    <path
+       style="opacity:0.58999999;fill:#f9ff00;fill-opacity:1;fill-rule:evenodd;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 641.01968,161.93709 16.57812,119.7617 4.60938,-44.79686 z"
+       id="path6968"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cccc" />
+    <ellipse
+       style="opacity:1;fill:#ffff00;fill-opacity:1;fill-rule:evenodd;stroke:#fa1e00;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path7155-6"
+       cx="657.9259"
+       cy="283.43317"
+       rx="2.5"
+       ry="2.25" />
+    <path
+       style="fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 1;stroke-dashoffset:0;stroke-opacity:1"
+       d="m 662.39317,239.40171 -4.74699,41.25043"
+       id="path7134-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc" />
+    <ellipse
+       style="opacity:1;fill:#ff1700;fill-opacity:1;fill-rule:evenodd;stroke:#fa1e00;stroke-width:0.75869834;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path7155-6-5"
+       cx="662.73499"
+       cy="237.10844"
+       rx="1.8251557"
+       ry="1.7740294" />
   </g>
 </svg>
