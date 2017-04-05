@@ -9,7 +9,7 @@ import ipywidgets as widgets
 import traitlets
 
 from cg import Point
-from hidden import VType, append_shorthands 
+from hidden import VType
 
 def natural_sort(l): 
     convert = lambda text: int(text) if text.isdigit() else text.lower() 

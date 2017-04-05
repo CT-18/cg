@@ -26,14 +26,14 @@ class Hedge:
     def __repr__(self):
         return '{}->{}'.format(self.origin, self.twin.origin)
     
-def append_shorthands(points):
-    for p in points:
-        p.x = p.coord[0]
-        p.y = p.coord[1]
+#def append_shorthands(points):
+#    for p in points:
+#        p.x = p.coord[0]
+#        p.y = p.coord[1]
 
 
 def build_dcel(vert):
-    append_shorthands(vert)
+    #append_shorthands(vert)
     dcel = []
     start = Hedge(vert[0])
     start.twin = Hedge(vert[1])
@@ -104,10 +104,10 @@ def merge_polygons(outer_polygon, outer_h, inner_polygon, inner_h):
     def add_edge(from_h, to_h):
             # новое ребро
             tmp = Point(int(from_h.next.origin.x),int(from_h.next.origin.y))
-            append_shorthands([tmp])
+            #append_shorthands([tmp])
             h = Hedge(tmp)
             tmp = Point(int(to_h.origin.x), int(to_h.origin.y))
-            append_shorthands([tmp])
+            #append_shorthands([tmp])
             h.twin = Hedge(tmp)
             h.twin.twin = h
 
