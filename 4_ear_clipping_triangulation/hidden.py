@@ -2,13 +2,6 @@ from enum import Enum
 from cg import Point
 
 
-class VType(Enum):
-    start = 1
-    split = 2
-    end = 3
-    merge = 4
-    regular = 5
-
 def turn(v1, v2, v3):
     return (v2.x - v1.x) * (v3.y - v1.y) - (v3.x - v1.x) * (v2.y - v1.y)
 
@@ -25,15 +18,8 @@ class Hedge:
         
     def __repr__(self):
         return '{}->{}'.format(self.origin, self.twin.origin)
-    
-#def append_shorthands(points):
-#    for p in points:
-#        p.x = p.coord[0]
-#        p.y = p.coord[1]
-
 
 def build_dcel(vert):
-    #append_shorthands(vert)
     dcel = []
     start = Hedge(vert[0])
     start.twin = Hedge(vert[1])
@@ -58,21 +44,6 @@ def build_dcel(vert):
     cur.twin.prev = start.twin
     vert[0].hedge = start
     return dcel
-
-def add_diagonal(hfrom, hto):
-    d = Hedge(hfrom.origin)
-    d.twin = Hedge(hto.origin)
-    """
-    hfrom.prev.next = d
-    d.prev = hfrom.prev
-    hfrom.prev = d.twin
-    d.twin.next = hfrom
-    hto.prev.next = d.twin
-    d.twin.prev = hto.prev
-    hto.prev = d
-    d.next = hto
-    """
-    return d
 
 def add_diagonal2(hfrom, hto):
     d = Hedge(hfrom.origin)
@@ -104,10 +75,8 @@ def merge_polygons(outer_polygon, outer_h, inner_polygon, inner_h):
     def add_edge(from_h, to_h):
             # новое ребро
             tmp = Point(int(from_h.next.origin.x),int(from_h.next.origin.y))
-            #append_shorthands([tmp])
             h = Hedge(tmp)
             tmp = Point(int(to_h.origin.x), int(to_h.origin.y))
-            #append_shorthands([tmp])
             h.twin = Hedge(tmp)
             h.twin.twin = h
 

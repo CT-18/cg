@@ -9,70 +9,14 @@ import ipywidgets as widgets
 import traitlets
 
 from cg import Point
-from hidden import VType
+# from cg import turn
+from hidden import turn
+from enum import Enum
 
 def natural_sort(l): 
     convert = lambda text: int(text) if text.isdigit() else text.lower() 
     alphanum_key = lambda key: [ convert(c) for c in re.split('([0-9]+)', key) ] 
     return sorted(l, key = alphanum_key)
-
-def _type_color(v):
-        if v.vtype == VType.regular:
-            return 'ok'
-        if v.vtype == VType.start:
-            return 'sy'
-        if v.vtype == VType.end:
-            return 'sg'
-        if v.vtype == VType.split:
-            return '^r'
-        if v.vtype == VType.merge:
-            return 'vb'
-
-def draw_points(source, types=False):
-    xmin, xmax = min([i.x for i in source]) - 2, max([i.x for i in source]) + 2
-    ymin, ymax = min([i.y for i in source]) - 2, max([i.y for i in source]) + 2
-    plt.figure(figsize=(6,6))
-    plt.plot([i.x for i in source + [source[0]]], [i.y for i in source + [source[0]]],'k-', zorder=0)
-    if types:
-        d = defaultdict(list)
-        for v in source:
-            d[_type_color(v)].append(v)
-        for k in d:
-            plt.plot([v.x for v in d[k]], [v.y for v in d[k]], k, label=str(d[k][0].vtype).split('.')[1], zorder=1)
-        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,numpoints=1)
-    else:
-        for v in source:
-            plt.plot(v.x, v.y,'ko', zorder=1)
-    plt.axis([xmin,xmax, ymin,ymax])
-    plt.show()
-
-def visual_dump_pieces(cur_v, D,D1,T,Q,filename):
-    xmin, xmax = min([i.x for i in Q]) - 2, max([i.x for i in Q]) + 2
-    ymin, ymax = min([i.y for i in Q]) - 2, max([i.y for i in Q]) + 2
-    fig = plt.figure(figsize=(5,5))
-    for h in D:
-        xs = [h.origin.x, h.twin.origin.x]
-        ys = [h.origin.y, h.twin.origin.y]
-        plt.plot(xs,ys,'k-')
-    for h in D1:
-        xs = [h.origin.x, h.twin.origin.x]
-        ys = [h.origin.y, h.twin.origin.y]
-        plt.plot(xs,ys,'b:')
-    for h in T:
-        xs = [h.origin.x, h.twin.origin.x]
-        ys = [h.origin.y, h.twin.origin.y]
-        plt.plot(xs,ys,'b-')
-    d = defaultdict(list)
-    for v in Q:
-        d[_type_color(v)].append(v)
-    for k in d:
-            plt.plot([v.x for v in d[k]], [v.y for v in d[k]], k, label=str(d[k][0].vtype).split('.')[1], zorder=100)
-    if not cur_v is None:
-        plt.axhline(cur_v.y, xmin=0.05, xmax=0.95, color='black',linestyle='dashed')
-    plt.axis([xmin,xmax, ymin,ymax])
-    lgd = plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.,numpoints=1)
-    plt.savefig(filename, bbox_extra_artists=(lgd,), bbox_inches='tight')
-    plt.close(fig)
 
 def visual_dump_triang(cur_v,D,D1,S,Q,filename):
     xmin, xmax = min([i.x for i in Q]) - 2, max([i.x for i in Q]) + 2
@@ -133,7 +77,6 @@ def visual_dump_bypass(cur_v, D, filename):
     plt.savefig(filename)
     plt.close(fig)
     
-from enum import Enum
 class Merging_step(Enum):
     BEFORE_START = 0
     LEFT_LOWER = 1

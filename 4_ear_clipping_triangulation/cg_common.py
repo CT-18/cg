@@ -35,6 +35,7 @@ def get_intersection_point(a, b, c, d):
         raise Exception('Incorrect test!')
     return np.array([p[0], p[1], 1])
 
+# Проверка на принадлежность точки пересечению полуплоскостей
 def surf_intersection(point, *lines):
     for line in lines:
         if turn(line[0], line[1], point) < 0:
