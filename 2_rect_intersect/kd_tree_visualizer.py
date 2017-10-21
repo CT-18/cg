@@ -7,6 +7,13 @@ from IPython.display import display
 from random import random
 from cg.utils import *
 
+# генерация точек
+def generatePoints(size_test):
+    points = []
+    for i in range(0, size_test):
+        points.append((randint(0, 20), randint(0, 20)))
+    return points
+
 # подсчет глубины kd-дерева
 def countSteps(points, axis):
     if (len(points) <= 2):
