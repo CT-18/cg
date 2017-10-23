@@ -7,13 +7,6 @@ from IPython.display import display
 from random import random
 from cg.utils import *
 
-# генерация точек
-def generatePoints(size_test):
-    points = []
-    for i in range(0, size_test):
-        points.append((randint(0, 20), randint(0, 20)))
-    return points
-
 # подсчет глубины kd-дерева
 def countSteps(points, axis):
     if (len(points) <= 2):
@@ -130,7 +123,7 @@ def kd_tree_search_visualize(box, points):
         # возвращает массив точек содержащихся в box
         def search(self, box):
             if (inside(self.box, box)):
-                ax1.add_patch(patches.Rectangle((self.box[0], self.box[1]), self.box[2] - self.box[0], self.box[3] - self.box[1], color='r', alpha=0.1))
+                ax1.add_patch(patches.Rectangle((self.box[0], self.box[1]), self.box[2] - self.box[0], self.box[3] - self.box[1], color='b', alpha=0.1))
                 return self.points
             ans = []
             if (self.left == None and self.right == None):
