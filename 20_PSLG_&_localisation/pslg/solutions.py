@@ -144,20 +144,33 @@ class OverlayModel:
 
         p1 = self.get_polygon(p1)
         p2 = self.get_polygon(p2)
+        if p1.intersects(p2):
+            p3 = self.f(p1, p2)
+            print("result={}".format(p3))
 
-        p3 = self.f(p1, p2)
-
-        x, y = p3.exterior.coords.xy
-        self.ax1.add_patch(PolygonPatch(p3))
+            x, y = p3.exterior.coords.xy
+            self.ax1.add_patch(PolygonPatch(p3))
         self.ax1.set_xlim(MIN_X - 1, MAX_X + 1)
         self.ax1.set_ylim(MIN_Y - 1, MAX_X + 1)
-        print("result={}".format(p3))
+
         display(self.fig)
         plt.close()
-        return p3
+        if p1.intersects(p2):
+            return p3
+        return None
 
 
 # ______________________________________________________________________________________________________________________
+
+def getPoligons(model, size_x, size_y):
+    p1 = model.generate_figure(MIN_X + size_x / 2, MIN_Y + size_y / 2, min(size_x, size_y) / 2.5, 0.35, 0.2,
+                               COL_POINTS_FIRST)
+    p2 = model.generate_figure(MIN_X + size_x / 2, MIN_Y + size_y / 2, min(size_x, size_y) / 2.5, 0.35, 0.2,
+                               COL_POINTS_SECOND)
+    p11 = model.get_polygon(p1)
+    p22 = model.get_polygon(p2)
+    return p11, p22, p1, p2
+
 
 def test_overlaying(f, n=10):
     model = OverlayModel()
@@ -170,12 +183,7 @@ def test_overlaying(f, n=10):
         size_y = MAX_Y - MIN_Y - 1
         if size_y < 0:
             raise Exception('MAX_Y must be moer than MIN_Y')
-        p1 = model.generate_figure(MIN_X + size_x / 2, MIN_Y + size_y / 2, min(size_x, size_y) / 2.5, 0.35, 0.2,
-                                   COL_POINTS_FIRST)
-        p2 = model.generate_figure(MIN_X + size_x / 2, MIN_Y + size_y / 2, min(size_x, size_y) / 2.5, 0.35, 0.2,
-                                   COL_POINTS_SECOND)
-        p11 = model.get_polygon(p1)
-        p22 = model.get_polygon(p2)
+        p11, p22, p1, p2 = getPoligons(model, size_x, size_y)
         result = overlaying(p11, p22)
         answer = f(p11, p22)
         if answer == result:
@@ -190,6 +198,36 @@ def test_overlaying(f, n=10):
     print("All tests passed")
 
 
-def show_test(p1, p2, f):
+def show_test(p1, p2, f=overlaying):
     model = OverlayModel(f)
     model.draw(p1, p2)
+
+
+def event(he1, h22, point):
+    np.half
+
+
+def inside(g1, g2):
+    p1 = Polygon(g1)
+    p2 = Polygon(g2)
+    return p1.contains(p2)
+
+
+def test_inside(f, n=10):
+    model = OverlayModel()
+    for i in range(0, n):
+        if i % 2 == 0 and i != 0:
+            print('passed {} tests'.format(i))
+        p1, p2, arr1, arr2 = getPoligons(model, MAX_X - MIN_X - 1, MAX_Y - MIN_Y - 1)
+        answer = inside(arr1, arr2)
+        result = f(arr1, arr2)
+        if answer == result:
+            continue
+        else:
+            print("Test №{} failed".format(i + 1))
+            print("Expected {}, result {}".format(answer, result))
+            print("points_1={}".format(arr1))
+            print("points_2={}".format(arr2))
+            model.draw(p1, p2)
+            return
+    print("All tests passed")
