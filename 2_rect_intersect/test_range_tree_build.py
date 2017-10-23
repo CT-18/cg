@@ -17,15 +17,13 @@ def testBuildTree(testFunction):
     else:
         print("\n------------------------- FAIL -------------------------\n")
 
-
-# генератор тестов
+# генератор точек для теста
 def generateTest():
     points = []
-
     for i in range(0, TEST_SIZE):
         points.append(structures.Point(randint(-10, 10), randint(-10, 10)))
-
     return points
+
 
 # ------------------------- ПРОВЕРКИ -------------------------
 

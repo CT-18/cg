@@ -60,7 +60,7 @@ def buildRangeTree(points):
 
 # вспомогательная функция для getNodes
 def findInterval(result, curNode, vMin, vMax):
-    if (curNode in None or vMin > vMax):
+    if (curNode is None) or (vMin > vMax):
         return result
     if curNode.value >= vMin:
         if curNode.value <= vMax:
@@ -78,7 +78,7 @@ def getNodes(rangeTree, vMin, vMax):
     return findInterval([], rangeTree.root, vMin, vMax)
 
 # функция, возвращающая лист точек, содержащихся в прямоугольнике rect
-def pointsInRectangular(rangeTree, rect):
+def pointsInRectangle(rangeTree, rect):
     result = []
     yTrees = getNodes(rangeTree, rect.xMin, rect.xMax)
     for yTree in yTrees:
