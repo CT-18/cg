@@ -6,9 +6,20 @@ TEST_SIZE = 100
 
 # генерация точек для визуализации
 def generateVisualPoints(size_test):
+    m = {}
     points = []
-    for i in range(0, size_test):
-        points.append((randint(0, 20), randint(0, 20)))
+    repeat = size_test
+    max_repeat = 400
+    while (repeat > 0) and (max_repeat > 0):
+        x = randint(0, 20)
+        y = randint(0, 20)
+        if m.get(x) is None:
+            m[x] = set()
+        if not (y in m[x]):
+            points.append((x, y))
+            m[x].add(y)
+            repeat -= 1
+        max_repeat -= 1    
     return points
 
 # генератор точек для теста
