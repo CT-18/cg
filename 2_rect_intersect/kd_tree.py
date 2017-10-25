@@ -60,47 +60,65 @@ def buildKdNode(pSortX, pSortY, depth):
     if not depth:
         # четная глубина - делим вертикальной прямой
         mediana = pSortX[(len(pSortX) - 1) // 2].x
-        repeat = 2
-        while (repeat > 0):
-            repeat -= 1
-            for p in pSortX:
-                if p.x <= mediana:
-                    pSortLeftX.append(p)
+        inLeft = True
+        equalMedLeftY = set()
+        for p in pSortX:
+            if p.x < mediana:
+                pSortLeftX.append(p)
+            else:
+                if p.x == mediana:
+                    if inLeft:
+                        equalMedLeftY.add(p.y)
+                        pSortLeftX.append(p)
+                    else:
+                        pSortRightX.append(p)
+                    inLeft = not inLeft
                 else:
                     pSortRightX.append(p)
-            if len(pSortLeftX) - len(pSortRightX) > 3:
-                mediana -= 1
-                pSortLeftX.clear()
-                pSortRightX.clear()
-            else:
-                repeat -=1
+
         for p in pSortY:
-            if p.x <= mediana:
+            if p.x < mediana:
                 pSortLeftY.append(p)
             else:
-                pSortRightY.append(p)
+                if p.x == mediana:
+                    if p.y in equalMedLeftY:
+                        pSortLeftY.append(p)
+                    else:
+                        pSortRightY.append(p)
+                else:
+                    pSortRightY.append(p)
     else:
         # нечетная глубина - делим горизонтальной прямой
         mediana = pSortY[(len(pSortY) - 1) // 2].y
-        repeat = 2
-        while (repeat > 0):
-            repeat -= 1
-            for p in pSortX:
-                if p.y <= mediana:
-                    pSortLeftX.append(p)
+        inLeft = True
+        equalMedLeftX = set()
+        for p in pSortX:
+            if p.y < mediana:
+                pSortLeftX.append(p)
+            else:
+                if p.y == mediana:
+                    if inLeft:
+                        equalMedLeftX.add(p.x)
+                        pSortLeftX.append(p)
+                    else:
+                        pSortRightX.append(p)
+                    inLeft = not inLeft
                 else:
                     pSortRightX.append(p)
-            if len(pSortLeftX) - len(pSortRightX) > 2:
-                mediana -= 1
-                pSortLeftX.clear()
-                pSortRightX.clear()
-            else:
-                repeat -= 1
+
         for p in pSortY:
-            if p.y <= mediana:
+            if p.y < mediana:
                 pSortLeftY.append(p)
             else:
-                pSortRightY.append(p)
+                if p.y == mediana:
+                    if p.x in equalMedLeftX:
+                        pSortLeftY.append(p)
+                    else:
+                        pSortRightY.append(p)
+                else:
+                    pSortRightY.append(p)
+    if (len(pSortLeftX) != len(pSortLeftY)):
+        print("FUCKFUCKFUCK",len(pSortLeftX), " ", len(pSortLeftY) )
     node.setMedian(mediana)
     if len(pSortLeftX) > 0:
         node.leftChild = buildKdNode(pSortLeftX, pSortLeftY, not depth)
@@ -130,10 +148,10 @@ def getPoints(result, node, depth, region, rect):
 
     if not depth:
         # хранится вертикальная прямая (медиана по х)
-        if (region.yMin >= rect.yMax) or (region.yMax < rect.yMin):
+        if (region.yMin > rect.yMax) or (region.yMax < rect.yMin):
             return result
 
-        if (node.med < rect.xMax):
+        if (node.med <= rect.xMax):
             newRegion.xMin = node.med
             getPoints(result, node.rightChild, not depth, newRegion, rect)
         if (node.med >= rect.xMin):
@@ -142,10 +160,10 @@ def getPoints(result, node, depth, region, rect):
 
     else:
         # хранится горизонтальная прямая (медиана по y)
-        if (region.xMin >= rect.xMax) or (region.xMax < rect.xMin):
+        if (region.xMin > rect.xMax) or (region.xMax < rect.xMin):
             return result
 
-        if (node.med < rect.yMax):
+        if (node.med <= rect.yMax):
             newRegion.yMin = node.med
             getPoints(result, node.rightChild, not depth, newRegion, rect)
         if (node.med >= rect.yMin):
