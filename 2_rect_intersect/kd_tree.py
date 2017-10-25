@@ -117,8 +117,6 @@ def buildKdNode(pSortX, pSortY, depth):
                         pSortRightY.append(p)
                 else:
                     pSortRightY.append(p)
-    if (len(pSortLeftX) != len(pSortLeftY)):
-        print("FUCKFUCKFUCK",len(pSortLeftX), " ", len(pSortLeftY) )
     node.setMedian(mediana)
     if len(pSortLeftX) > 0:
         node.leftChild = buildKdNode(pSortLeftX, pSortLeftY, not depth)
