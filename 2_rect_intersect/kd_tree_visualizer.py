@@ -5,7 +5,21 @@ import numpy as np
 from ipywidgets import interact, interactive, IntSlider
 from IPython.display import display
 from random import random
+import generator
 from cg.utils import *
+from cg.point import *
+
+# запускает визуализатор построение kd-tree для count точек
+def kd_tree_build_visualize(count):
+    PointTestGenerator.intRandomLower = 0
+    PointTestGenerator.intRandomUpper = 20
+    points = PointSet(PointTestGenerator.generateInteger(2, count))
+    build_visualize(points)
+
+# запускает визуализатор поиска точек, содержащихся в rect, в kd-tree, построенного для count точек
+def kd_tree_search_visualize(rect, count):
+    points = generator.generateVisualPoints(count)
+    search_visualize(rect, points)        
 
 # подсчет глубины kd-дерева
 def countSteps(points, axis):
@@ -18,7 +32,7 @@ def countSteps(points, axis):
     return max(countSteps(sorted_points[:mean], (axis + 1) % 2), countSteps(sorted_points[mean:], (axis + 1) % 2)) + 1;
 
 # Визуализотор построения kd-дерева на заданных точках
-def kd_tree_visualize_build(points):
+def build_visualize(points):
     
     fig = plt.figure(figsize=(6, 6), num=' ')
     ax = plt.subplot(111, aspect='equal')
@@ -90,7 +104,7 @@ def intersect(a, b):
         return False   
     return True
     
-def kd_tree_search_visualize(box, points):
+def search_visualize(box, points):
     fig1 = plt.figure(figsize=(6, 6), num='  ')
     ax1 = plt.subplot(111, aspect='equal')
     p = np.array(points)
@@ -179,4 +193,4 @@ def kd_tree_search_visualize(box, points):
     # корень kd-дерева, содержит все точки и соответсвует всей плоскости, вервый разделитель - вертикальный
     root = node(points, [0, 0, 20, 20], 0)
     root.build()
-    print(root.search(box))
+    print(root.search(box)) 
