@@ -17,11 +17,11 @@ class Node:
         self.y = y
 
 class KdTree:
-    def __init__(self, root, xMin, xMax, yMin, yMax):
+    def __init__(self, root, xMin, yMin, xMax, yMax):
         self.root = root
         self.xMin = xMin
-        self.xMax = xMax
         self.yMin = yMin
+        self.xMax = xMax
         self.yMax = yMax
 
 
@@ -42,7 +42,7 @@ def buildKdTree(points):
     xMax = sortX[len(sortX) - 1].x
     yMin = sortY[0].y
     yMax = sortY[len(sortY) - 1].y
-    return KdTree(root, xMin, xMax, yMin, yMax)
+    return KdTree(root, xMin, yMin, xMax, yMax)
 
 # вспомогательная функция для kd-tree
 def buildKdNode(pSortX, pSortY, depth):
@@ -129,7 +129,7 @@ def buildKdNode(pSortX, pSortY, depth):
 
 # функция, возвращающая лист точек, содержащихся в прямоугольнике rect
 def pointsInRectangle(kdTree, rect):
-    region = structures.Rectangle(kdTree.xMin, kdTree.xMax, kdTree.yMin, kdTree.yMax)
+    region = structures.Rectangle(kdTree.xMin, kdTree.yMin, kdTree.xMax, kdTree.yMax)
     return getPoints([], kdTree.root, False, region, rect)
 
 # вспомогательная функция для pointInRectangle
@@ -142,7 +142,7 @@ def getPoints(result, node, depth, region, rect):
             result.append(structures.Point(node.x, node.y))
         return result
 
-    newRegion = structures.Rectangle(region.xMin, region.xMax, region.yMin, region.yMax)
+    newRegion = structures.Rectangle(region.xMin, region.yMin, region.xMax, region.yMax)
 
     if not depth:
         # хранится вертикальная прямая (медиана по х)

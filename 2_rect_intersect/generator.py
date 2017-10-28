@@ -45,4 +45,4 @@ def generateTestRect():
     yMax = randint(-10, 10)
     if (yMin > yMax):
         yMin, yMax = yMax, yMin
-    return structures.Rectangle(xMin, xMax, yMin, yMax)
+    return structures.Rectangle(xMin, yMin, xMax, yMax)

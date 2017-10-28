@@ -24,8 +24,8 @@ def comparePointsLists(first, second):
     return True
 
 class Rectangle:
-    def __init__(self, xMin, xMax, yMin, yMax):
+    def __init__(self, xMin, yMin, xMax, yMax):
         self.xMin = xMin
-        self.xMax = xMax
         self.yMin = yMin
+        self.xMax = xMax
         self.yMax = yMax
