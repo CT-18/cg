@@ -172,9 +172,6 @@ def search_visualize(box, points):
                     ax1.plot([self.box[0], self.box[2]], [self.mean, self.mean], color='k', linestyle='-', linewidth=1)
         
             # построение детей
-            # if (len(A) <= 1 and len(B) <= 1):
-            #     return 1
-            # else: 
             if (self.i == 0):
                 if len(A) > 0:
                     self.left = node(A, [self.box[0], self.box[1], self.mean, self.box[3]], (self.i + 1) % 2)
