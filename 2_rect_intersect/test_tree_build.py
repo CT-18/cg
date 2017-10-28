@@ -1,31 +1,32 @@
 import structures
 import generator
 import range_tree
-import kd_tree
-
-# тестирование построения range-tree
-def testBuildRangeTree(testFunction):
-    points = generator.generateTestPoints()
-
-    result = testFunction(points)
-    expectedResult = range_tree.buildRangeTree(points)
-
-    if correctRangeTreeStructure(result) and compareRangeTrees(expectedResult, result):
-        print("\n------------------------- OK -------------------------\n")
-    else:
-        print("\n------------------------- FAIL -------------------------\n")
 
 # тестирование построения kd-tree
 def testBuildKdTree(testFunction):
-    points = generator.generateTestPoints()
+    tests = 100
+    while (tests > 0):
+        tests -= 1
+        points = generator.generateTestPoints()
+        result = testFunction(points)
+        if (not correctKdTreeStructure(result)) or (not correctKdTreeContent(result, points)):
+            print("\n------------------------- FAIL -------------------------\n")
+            return
+    print("\n------------------------- OK -------------------------\n")
 
-    result = testFunction(points)
 
-    if correctKdTreeStructure(result) and correctKdTreeContent(result, points):
-        print("\n------------------------- OK -------------------------\n")
-    else:
-        print("\n------------------------- FAIL -------------------------\n")
-
+# тестирование построения range-tree
+def testBuildRangeTree(testFunction):
+    tests = 100
+    while (tests > 0):
+        tests -= 1
+        points = generator.generateTestPoints()
+        result = testFunction(points)
+        expectedResult = range_tree.buildRangeTree(points)
+        if (not correctRangeTreeStructure(result)) or (not compareRangeTrees(expectedResult, result)):
+            print("\n------------------------- FAIL -------------------------\n")
+            return
+    print("\n------------------------- OK -------------------------\n")
 
 # ------------------------- ПРОВЕРКА KD-TREE -------------------------
 
