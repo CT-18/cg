@@ -38,10 +38,10 @@ def buildKdTree(points):
     sortY = copy.deepcopy(points)
 
     root = buildKdNode(sortX, sortY, False)
-    xMin = sortX[0].x - 1
-    xMax = sortX[len(sortX) - 1].x + 1
-    yMin = sortY[0].y - 1
-    yMax = sortY[len(sortY) - 1].y + 1
+    xMin = sortX[0].x
+    xMax = sortX[len(sortX) - 1].x
+    yMin = sortY[0].y
+    yMax = sortY[len(sortY) - 1].y
     return KdTree(root, xMin, xMax, yMin, yMax)
 
 # вспомогательная функция для kd-tree

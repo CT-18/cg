@@ -25,8 +25,6 @@ def kd_tree_visualize_build(points):
     ax.plot(points.points[:, 0], points.points[:, 1], 'o', color='red')
     max_point = points.max()
     min_point = points.max(lambda f,s : -cmp_(f, s))
-    #ax.set_xlim(min_point[0], max_point[0])
-    #ax.set_ylim(min_point[1], max_point[1])
     ax.set_xlim(0, 20)
     ax.set_ylim(0, 20)
 
@@ -69,20 +67,13 @@ def kd_tree_visualize_build(points):
         ax.plot(points.points[:, 0], points.points[:, 1], 'o', color='red')
         ax.set_xlim(0, 20)
         ax.set_ylim(0, 20)
-        #ax.set_xlim(min_point[0], max_point[0])
-        #ax.set_ylim(min_point[1], max_point[1])
         display(fig)
-        print(points)
-        print(max_point)
-        print(min_point)
     
     display(interactive(changeStep, step=(0, steps)))
 
 def inside(box1, box2):
-    if (box1[0] >= box2[0] and box1[0] <= box2[2] and 
-        box1[2] >= box2[0] and box1[2] <= box2[2] and
-        box1[1] >= box2[1] and box1[1] <= box2[3] and 
-        box1[3] >= box2[1] and box1[3] <= box2[3]):
+    if (box1[0] >= box2[0] and box1[2] <= box2[2] and
+        box1[1] >= box2[1] and box1[3] <= box2[3]):
         return True
     else:
         return False
@@ -96,7 +87,7 @@ def inside_p(x, y, box):
     
 def intersect(a, b):
     if (a[3] < b[1] or a[1] > b[3] or a[2] < b[0] or a[0] > b[2]):
-        return False
+        return False   
     return True
     
 def kd_tree_search_visualize(box, points):
@@ -123,24 +114,24 @@ def kd_tree_search_visualize(box, points):
         # возвращает массив точек содержащихся в box
         def search(self, box):
             if (inside(self.box, box)):
-                ax1.add_patch(patches.Rectangle((self.box[0], self.box[1]), self.box[2] - self.box[0], self.box[3] - self.box[1], color='b', alpha=0.1))
+                ax1.add_patch(patches.Rectangle((self.box[0], self.box[1]), self.box[2] - self.box[0], self.box[3] - self.box[1], color='r', alpha=0.1))
                 return self.points
             ans = []
             if (self.left == None and self.right == None):
-                if (intersect(box, self.box)):
+                if (intersect(self.box, box)):
                     ax1.add_patch(patches.Rectangle((self.box[0], self.box[1]), self.box[2] - self.box[0], self.box[3] - self.box[1], color='b', alpha=0.1))
                 for p in self.points:
                     if (inside_p(p[0], p[1], box)):
-                        ans += p
+                        ans.append(p)
             if (self.left != None):
-                ans += self.left.search(box)
+                ans.extend(self.left.search(box))
             if (self.right != None):
-                ans += self.right.search(box)
+                ans.extend(self.right.search(box))
             return ans
         
         # построение дерева
         def build(self):
-            if (len(self.points) == 0):
+            if (len(self.points) == 1):
                 return;
         
             # ищем медиану точек и делим их на 2 части
@@ -148,11 +139,17 @@ def kd_tree_search_visualize(box, points):
             self.mean = np.mean(p[:, self.i])
             A = list()
             B = list()
+            inLeft = True
             for p in self.points:
                 if (p[self.i] < self.mean):
                     A.append(p)
                 else:
-                    B.append(p)
+                    if (p[self.i] == self.mean) and inLeft:
+                        A.append(p)
+                        inLeft = not inLeft
+                    else:    
+                        B.append(p)
+                        
             # визуализация разделяющей прямой
             if (len(A) + len(B) >= 2):
                 if (self.i == 0):
@@ -161,21 +158,25 @@ def kd_tree_search_visualize(box, points):
                     ax1.plot([self.box[0], self.box[2]], [self.mean, self.mean], color='k', linestyle='-', linewidth=1)
         
             # построение детей
-            if (len(A) <= 1 and len(B) <= 1):
-                return 1
-            else: 
-                if (self.i == 0):
+            # if (len(A) <= 1 and len(B) <= 1):
+            #     return 1
+            # else: 
+            if (self.i == 0):
+                if len(A) > 0:
                     self.left = node(A, [self.box[0], self.box[1], self.mean, self.box[3]], (self.i + 1) % 2)
-                    self.left.build()
+                    self.left.build() 
+                if len(B) > 0:    
                     self.right = node(B, [self.mean, self.box[1], self.box[2], self.box[3]], (self.i + 1) % 2)
                     self.right.build()
-                else:
+            else:
+                if len(A) > 0:
                     self.left = node(A, [self.box[0], self.box[1], self.box[2], self.mean], (self.i + 1) % 2)
                     self.left.build()
+                if len(B) > 0:    
                     self.right = node(B, [self.box[0], self.mean, self.box[2], self.box[3]], (self.i + 1) % 2)
                     self.right.build()
     
     # корень kd-дерева, содержит все точки и соответсвует всей плоскости, вервый разделитель - вертикальный
     root = node(points, [0, 0, 20, 20], 0)
     root.build()
-    print (root.search(box))
+    print(root.search(box))
