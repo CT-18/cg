@@ -9,14 +9,14 @@ import generator
 from cg.utils import *
 from cg.point import *
 
-# запускает визуализатор построение kd-tree для count точек
+# запускает визуализатор построения kd-tree для count точек
 def kd_tree_build_visualize(count):
     PointTestGenerator.intRandomLower = 0
     PointTestGenerator.intRandomUpper = 20
     points = PointSet(PointTestGenerator.generateInteger(2, count))
     build_visualize(points)
 
-# запускает визуализатор поиска точек, содержащихся в rect, в kd-tree, построенного для count точек
+# запускает визуализатор поиска точек, содержащихся в rect, в kd-tree, построенном для count точек
 def kd_tree_search_visualize(rect, count):
     points = generator.generateVisualPoints(count)
     search_visualize(rect, points)        
