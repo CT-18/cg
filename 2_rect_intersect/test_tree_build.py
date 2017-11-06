@@ -1,11 +1,11 @@
-import structures
 import generator
 import range_tree
+from structures import *
 
 # тестирование построения kd-tree
 def testBuildKdTree(testFunction):
     tests = 100
-    while (tests > 0):
+    while tests > 0:
         tests -= 1
         points = generator.generateTestPoints()
         result = testFunction(points)
@@ -28,6 +28,7 @@ def testBuildRangeTree(testFunction):
             return
     print("\n------------------------- OK -------------------------\n")
 
+
 # ------------------------- ПРОВЕРКА KD-TREE -------------------------
 
 # проверка корректности структуры kd-tree
@@ -39,14 +40,15 @@ def checkKdTreeStructure(node, depth, grand, parent, haveLeftGrand, haveLeftPare
     if node is None:
         return True
     if (node.leftChild is None) and (node.leftChild is None):
-        pVal = node.x
-        gVal = node.y
-        if (depth % 2 == 0):
-            pVal, gVal = gVal, pVal
-        if (haveLeftParent and (pVal < parent)) or ((not haveLeftParent) and (pVal > parent)):
-            return False
-        if (haveLeftGrand and (gVal < grand)) or ((not haveLeftGrand) and (gVal > grand)):
-            return False
+        for p in node.points:
+            pVal = p.x
+            gVal = p.y
+            if depth % 2 == 0:
+                pVal, gVal = gVal, pVal
+            if (haveLeftParent and (pVal < parent)) or ((not haveLeftParent) and (pVal > parent)):
+                return False
+            if (haveLeftGrand and (gVal < grand)) or ((not haveLeftGrand) and (gVal > grand)):
+                return False
         return True
     if depth > 1:
         if haveLeftGrand and (node.med < grand):
@@ -63,21 +65,22 @@ def checkKdTreeStructure(node, depth, grand, parent, haveLeftGrand, haveLeftPare
 
 # проверка корректности данных, хранимых в kd-tree
 def correctKdTreeContent(tree, points):
-    treePoints = checkKdTreeContent([], tree.root)
-    return structures.comparePointsLists(points, treePoints)
+    treePoints = checkKdTreeContent(tree.root)
+    return comparePointsLists(points, treePoints)
 
 # возращает лист точек, хранящихся в kd-tree
-def checkKdTreeContent(result, node):
+def checkKdTreeContent(node):
     if node is None:
-        return result
+        return []
     if (node.leftChild is None) and (node.leftChild is None):
-        result.append(structures.Point(node.x, node.y))
-        return result
+        return node.points
+    result = []
     if not (node.leftChild is None):
-        checkKdTreeContent(result, node.leftChild)
+        result.extend(checkKdTreeContent(node.leftChild))
     if not (node.rightChild is None):
-        checkKdTreeContent(result, node.rightChild)
+        result.extend(checkKdTreeContent(node.rightChild))
     return result
+
 
 # ------------------------- ПРОВЕРКА RANGE-TREE -------------------------
 
@@ -89,14 +92,14 @@ def correctRangeTreeStructure(tree):
 def checkRangeTreeStructure(curNode):
     if curNode is None:
         return True
-    if (not (checkRangeTreeStructure(curNode.leftChild) and checkRangeTreeStructure(curNode.rightChild))):
+    if not (checkRangeTreeStructure(curNode.leftChild) and checkRangeTreeStructure(curNode.rightChild)):
         return False
     return ((curNode.leftChild is None) or (curNode.leftChild.value <= curNode.value)) and ((curNode.rightChild is None) or (curNode.rightChild.value > curNode.value))
 
 # сравнение хранящихся в range-tree значений
 def compareRangeTrees(first, second):
-    first_nodes = findAll([], first.root)
-    second_nodes = findAll([], second.root)
+    first_nodes = findAll(first.root)
+    second_nodes = findAll(second.root)
     if len(first_nodes) != len(second_nodes):
         return False
     s_it = iter(second_nodes)
@@ -104,8 +107,8 @@ def compareRangeTrees(first, second):
         s = s_it.__next__()
         if f.value != s.value:
             return False
-        f_in_nodes = findAll([], f.innerTree.root)
-        s_in_nodes = findAll([], s.innerTree.root)
+        f_in_nodes = findAll(f.innerTree.root)
+        s_in_nodes = findAll(s.innerTree.root)
         if len(f_in_nodes) != len(s_in_nodes):
             return False
         s_in_it = iter(s_in_nodes)
@@ -116,11 +119,12 @@ def compareRangeTrees(first, second):
     return True
 
 # добавляет в result все ноды из range-tree, упорядоченные по возрастанию value
-def findAll(result, curNode):
+def findAll(curNode):
     if curNode is None:
-        return result
-    findAll(result, curNode.leftChild)
+        return []
+    result = []
+    result.extend(findAll(curNode.leftChild))
     result.append(curNode)
-    findAll(result, curNode.rightChild)
+    result.extend(findAll(curNode.rightChild))
     return result
 

@@ -1,4 +1,4 @@
-import structures
+from structures import *
 
 class Node:
     def __init__(self, value, innerTree):
@@ -15,19 +15,19 @@ class RangeTree:
         self.root = newRoot
 
     def insert(self, value, innerTree):
-        if (self.root is None):
+        if self.root is None:
             self.setRoot(Node(value, innerTree))
         else:
             self.insertNode(self.root, Node(value, innerTree))
 
     def insertNode(self, curNode, newNode):
-        if (newNode.value <= curNode.value):
-            if (curNode.leftChild):
+        if newNode.value <= curNode.value:
+            if curNode.leftChild:
                 self.insertNode(curNode.leftChild, newNode)
             else:
                 curNode.leftChild = newNode
         else:
-            if (curNode.rightChild):
+            if curNode.rightChild:
                 self.insertNode(curNode.rightChild, newNode)
             else:
                 curNode.rightChild = newNode
@@ -59,23 +59,22 @@ def buildRangeTree(points):
 # ------------------------- ВЫПОЛНЕНИЕ ЗАПРОСА -------------------------
 
 # вспомогательная функция для getNodes
-def findInterval(result, curNode, vMin, vMax):
+def findInterval(curNode, vMin, vMax):
     if (curNode is None) or (vMin > vMax):
-        return result
+        return []
+    result = []
     if curNode.value >= vMin:
+        result.extend(findInterval(curNode.leftChild, vMin, vMax))
         if curNode.value <= vMax:
-            findInterval(result, curNode.leftChild, vMin, vMax)
             result.append(curNode)
-            findInterval(result, curNode.rightChild, vMin, vMax)
-        else:
-            findInterval(result, curNode.leftChild, vMin, vMax)
+            result.extend(findInterval(curNode.rightChild, vMin, vMax))
     else:
-        findInterval(result, curNode.rightChild, vMin, vMax)
+        result.extend(findInterval(curNode.rightChild, vMin, vMax))
     return result
 
 # функция, возвращающая лист нод range-tree, value которых находится (нестрого) в интервале от vMin до vMax
 def getNodes(rangeTree, vMin, vMax):
-    return findInterval([], rangeTree.root, vMin, vMax)
+    return findInterval(rangeTree.root, vMin, vMax)
 
 # функция, возвращающая лист точек, содержащихся в прямоугольнике rect
 def pointsInRectangle(rangeTree, rect):
@@ -84,7 +83,7 @@ def pointsInRectangle(rangeTree, rect):
     for yTree in yTrees:
         yNodes = getNodes(yTree.innerTree, rect.yMin, rect.yMax)
         for yNode in yNodes:
-            result.append(structures.Point(yTree.value, yNode.value))
+            result.append(Point(yTree.value, yNode.value))
     return result
 
 

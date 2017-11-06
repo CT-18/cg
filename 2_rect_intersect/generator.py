@@ -1,6 +1,5 @@
-import structures
-
 from random import randint
+from structures import *
 
 TEST_SIZE = 100
 
@@ -27,7 +26,7 @@ def generateTestPoints():
     m = {}
     points = []
     for i in range(0, TEST_SIZE):
-        point = structures.Point(randint(-10, 10), randint(-10, 10))
+        point = Point(randint(-10, 10), randint(-10, 10))
         if m.get(point.x) is None:
             m[point.x] = set()
         if not (point.y in m[point.x]):
@@ -39,10 +38,10 @@ def generateTestPoints():
 def generateTestRect():
     xMin = randint(-10, 10)
     xMax = randint(-10, 10)
-    if (xMin > xMax):
+    if xMin > xMax:
         xMin, xMax = xMax, xMin
     yMin = randint(-10, 10)
     yMax = randint(-10, 10)
-    if (yMin > yMax):
+    if yMin > yMax:
         yMin, yMax = yMax, yMin
-    return structures.Rectangle(xMin, yMin, xMax, yMax)
+    return Rectangle(xMin, yMin, xMax, yMax)

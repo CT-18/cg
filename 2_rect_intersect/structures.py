@@ -23,9 +23,15 @@ def comparePointsLists(first, second):
             return False
     return True
 
+
 class Rectangle:
     def __init__(self, xMin, yMin, xMax, yMax):
         self.xMin = xMin
         self.yMin = yMin
         self.xMax = xMax
         self.yMax = yMax
+
+    def include(self, rect):
+        if (rect.xMin >= self.xMin) and (rect.yMin >= self.yMin) and (rect.xMax <= self.xMax)  and (rect.yMax <= self.yMax):
+            return True
+        return False
