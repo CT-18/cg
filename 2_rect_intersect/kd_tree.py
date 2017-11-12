@@ -1,5 +1,5 @@
+import structures
 import copy
-from structures import *
 
 class Node:
     def __init__(self, points):
@@ -27,9 +27,9 @@ def buildKdTree(points):
     if len(points) == 0:
         return KdTree(None, 0, 0, 0, 0)
 
-    points.sort(key=keyX)
+    points.sort(key=structures.keyX)
     sortX = copy.deepcopy(points)
-    points.sort(key=keyY)
+    points.sort(key=structures.keyY)
     sortY = copy.deepcopy(points)
 
     root = buildKdNode(sortX, sortY, False)
@@ -123,7 +123,7 @@ def buildKdNode(pSortX, pSortY, depth):
 
 # функция, возвращающая лист точек, содержащихся в прямоугольнике rect
 def pointsInRectangle(kdTree, rect):
-    region = Rectangle(kdTree.xMin, kdTree.yMin, kdTree.xMax, kdTree.yMax)
+    region = structures.Rectangle(kdTree.xMin, kdTree.yMin, kdTree.xMax, kdTree.yMax)
     return getPoints(kdTree.root, False, region, rect)
 
 # вспомогательная функция для pointInRectangle
@@ -146,15 +146,15 @@ def getPoints(node, depth, region, rect):
         if (region.yMin > rect.yMax) or (region.yMax < rect.yMin):
             return result
         if node.med <= rect.xMax:
-            result.extend(getPoints(node.rightChild, not depth, Rectangle(node.med, region.yMin, region.xMax, region.yMax), rect))
+            result.extend(getPoints(node.rightChild, not depth, structures.Rectangle(node.med, region.yMin, region.xMax, region.yMax), rect))
         if node.med >= rect.xMin:
-            result.extend(getPoints(node.leftChild, not depth, Rectangle(region.xMin, region.yMin, node.med, region.yMax), rect))
+            result.extend(getPoints(node.leftChild, not depth, structures.Rectangle(region.xMin, region.yMin, node.med, region.yMax), rect))
     else:
         # хранится горизонтальная прямая (медиана по y)
         if (region.xMin > rect.xMax) or (region.xMax < rect.xMin):
             return result
         if node.med <= rect.yMax:
-            result.extend(getPoints(node.rightChild, not depth, Rectangle(region.xMin, node.med, region.xMax, region.yMax), rect))
+            result.extend(getPoints(node.rightChild, not depth, structures.Rectangle(region.xMin, node.med, region.xMax, region.yMax), rect))
         if node.med >= rect.yMin:
-            result.extend(getPoints(node.leftChild, not depth, Rectangle(region.xMin, region.yMin, region.xMax, node.med), rect))
+            result.extend(getPoints(node.leftChild, not depth, structures.Rectangle(region.xMin, region.yMin, region.xMax, node.med), rect))
     return result
