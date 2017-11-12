@@ -39,7 +39,7 @@ def testRangeTreePointsInRect(testFunction):
                 return
     print("\n------------------------- OK -------------------------\n")
 
-# тестирование данных реализаций range-tree и kd_tree
+# тестирование данных реализаций range-tree и kd-tree
 def testPointsInRect():
     tests = 10
     while tests > 0:

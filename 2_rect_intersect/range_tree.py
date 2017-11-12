@@ -1,24 +1,20 @@
 from structures import *
 
-class Node:
-    def __init__(self, value, innerTree):
+class BinarySearchTreeNode:
+    def __init__(self, value, point):
         self.leftChild = None
         self.rightChild = None
-        self.innerTree = innerTree
         self.value = value
+        self.point = point
 
-class RangeTree:
-    def __init__(self):
+class BinarySearchTree:
+    def __init__(self, points):
         self.root = None
-
-    def setRoot(self, newRoot):
-        self.root = newRoot
-
-    def insert(self, value, innerTree):
-        if self.root is None:
-            self.setRoot(Node(value, innerTree))
-        else:
-            self.insertNode(self.root, Node(value, innerTree))
+        for p in points:
+            if self.root is None:
+                self.root = BinarySearchTreeNode(p.y, p)
+            else:
+                self.insertNode(self.root, BinarySearchTreeNode(p.y, p))
 
     def insertNode(self, curNode, newNode):
         if newNode.value <= curNode.value:
@@ -32,59 +28,90 @@ class RangeTree:
             else:
                 curNode.rightChild = newNode
 
+class Node:
+    def __init__(self, value, innerTree):
+        self.leftChild = None
+        self.rightChild = None
+        self.value = value
+        self.innerTree = innerTree
+
+class RangeTree:
+    def __init__(self, root, vMin, vMax):
+        self.root = root
+        self.vMin = vMin
+        self.vMax = vMax
+
 
 # ------------------------- ПОСТРОЕНИЕ -------------------------
 
 # функция построения range-tree
 def buildRangeTree(points):
-    orderedPoints = {}
-    xValues = []
+    return RangeTree(buildRangeTreeNode(points), min(points, key=keyX).x, max(points, key=keyX).x)
 
+# функция построения ноды range-tree
+def buildRangeTreeNode(points):
+    if len(points) == 0:
+        return None
+    mediana = medianaX(points)
+    pointsLeft = []
+    pointsRight = []
     for p in points:
-        if xValues.count(p.x) == 0:
-            orderedPoints[p.x] = []
-            xValues.append(p.x)
-        orderedPoints[p.x].append(p.y)
-
-    resultTree = RangeTree()
-    for x in xValues:
-        innerTree = RangeTree()
-        for y in orderedPoints[x]:
-            innerTree.insert(y, None)
-        resultTree.insert(x, innerTree)
-
-    return resultTree
+        if p.x <= mediana:
+            pointsLeft.append(p)
+        else:
+            pointsRight.append(p)
+    node = Node(mediana, BinarySearchTree(points))
+    if (len(pointsLeft) == 0) or (len(pointsRight) == 0):
+        return node
+    node.leftChild = buildRangeTreeNode(pointsLeft)
+    node.rightChild = buildRangeTreeNode(pointsRight)
+    return node
 
 
 # ------------------------- ВЫПОЛНЕНИЕ ЗАПРОСА -------------------------
 
-# вспомогательная функция для getNodes
-def findInterval(curNode, vMin, vMax):
+# функция, возвращающая список точек, содержащихся в прямоугольнике rect
+def pointsInRectangle(rangeTree, rect):
+    result = []
+    trees = getTrees(rangeTree.root, rangeTree.vMin, rangeTree.vMax, rect.xMin, rect.xMax)
+    for tree in trees:
+        result.extend(getPoints(tree.root, rect.yMin, rect.yMax))
+    return result
+
+# функция, возвращающая список binary-search-tree, хранящихся в тех нодах range-tree, value которых находится (нестрого) в интервале от vMin до vMax
+def getTrees(curNode, curMin, curMax, vMin, vMax):
+    if (curNode is None) or (vMin > vMax):
+        return []
+    result = []
+    if (curNode.leftChild is None) and (curNode.rightChild is None):
+        if (vMin <= curNode.value) and (curNode.value <= vMax):
+            result.append(curNode.innerTree)
+            return result
+    if (vMin <= curMin) and (curMax <= vMax):
+        result.append(curNode.innerTree)
+        return result
+    if vMin <= curNode.value:
+        result.extend(getTrees(curNode.leftChild, curMin, curNode.value, vMin, min(curNode.value, vMax)))
+    if vMax > curNode.value:
+        result.extend(getTrees(curNode.rightChild, curNode.value, curMax, max(curNode.value, vMin), vMax))
+    return result
+
+# функция, возвращающая список точек, хранящихся в тех нодах binary-search-tree, value которых находится (нестрого) в интервале от vMin до vMax
+def getPoints(curNode, vMin, vMax):
     if (curNode is None) or (vMin > vMax):
         return []
     result = []
     if curNode.value >= vMin:
-        result.extend(findInterval(curNode.leftChild, vMin, vMax))
+        result.extend(getPoints(curNode.leftChild, vMin, vMax))
         if curNode.value <= vMax:
-            result.append(curNode)
-            result.extend(findInterval(curNode.rightChild, vMin, vMax))
+            result.append(curNode.point)
+            result.extend(getPoints(curNode.rightChild, vMin, vMax))
     else:
-        result.extend(findInterval(curNode.rightChild, vMin, vMax))
+        result.extend(getPoints(curNode.rightChild, vMin, vMax))
     return result
 
-# функция, возвращающая лист нод range-tree, value которых находится (нестрого) в интервале от vMin до vMax
-def getNodes(rangeTree, vMin, vMax):
-    return findInterval(rangeTree.root, vMin, vMax)
 
-# функция, возвращающая лист точек, содержащихся в прямоугольнике rect
-def pointsInRectangle(rangeTree, rect):
-    result = []
-    yTrees = getNodes(rangeTree, rect.xMin, rect.xMax)
-    for yTree in yTrees:
-        yNodes = getNodes(yTree.innerTree, rect.yMin, rect.yMax)
-        for yNode in yNodes:
-            result.append(Point(yTree.value, yNode.value))
-    return result
+
 
 
 

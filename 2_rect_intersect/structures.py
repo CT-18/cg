@@ -1,7 +1,7 @@
 import numpy as np
 
-
 # ------------------------- ТОЧКА -------------------------
+
 class Point:
     def __init__(self, x, y):
         self.coords = [x, y]

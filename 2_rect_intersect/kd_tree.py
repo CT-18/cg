@@ -71,7 +71,7 @@ def buildKdNode(points, depth):
 
 # ------------------------- ВЫПОЛНЕНИЕ ЗАПРОСА -------------------------
 
-# функция, возвращающая лист точек, содержащихся в прямоугольнике rect
+# функция, возвращающая список точек, содержащихся в прямоугольнике rect
 def pointsInRectangle(kdTree, rect):
     region = Rectangle(kdTree.xMin, kdTree.yMin, kdTree.xMax, kdTree.yMax)
     return getPoints(kdTree.root, False, region, rect)

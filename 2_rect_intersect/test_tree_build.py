@@ -1,5 +1,4 @@
 import generator
-import range_tree
 from structures import *
 
 # тестирование построения kd-tree
@@ -14,7 +13,6 @@ def testBuildKdTree(testFunction):
             return
     print("\n------------------------- OK -------------------------\n")
 
-
 # тестирование построения range-tree
 def testBuildRangeTree(testFunction):
     tests = 100
@@ -22,8 +20,7 @@ def testBuildRangeTree(testFunction):
         tests -= 1
         points = generator.generateTestPoints()
         result = testFunction(points)
-        expectedResult = range_tree.buildRangeTree(points)
-        if (not correctRangeTreeStructure(result)) or (not compareRangeTrees(expectedResult, result)):
+        if (not correctRangeTreeStructure(result)) or (not correctRangeTreeContent(result, points)):
             print("\n------------------------- FAIL -------------------------\n")
             return
     print("\n------------------------- OK -------------------------\n")
@@ -68,11 +65,11 @@ def correctKdTreeContent(tree, points):
     treePoints = checkKdTreeContent(tree.root)
     return comparePointsLists(points, treePoints)
 
-# возращает лист точек, хранящихся в kd-tree
+# возвращает список точек, хранящихся в kd-tree
 def checkKdTreeContent(node):
     if node is None:
         return []
-    if (node.leftChild is None) and (node.leftChild is None):
+    if (node.leftChild is None) and (node.rightChild is None):
         return node.points
     result = []
     if not (node.leftChild is None):
@@ -96,35 +93,28 @@ def checkRangeTreeStructure(curNode):
         return False
     return ((curNode.leftChild is None) or (curNode.leftChild.value <= curNode.value)) and ((curNode.rightChild is None) or (curNode.rightChild.value > curNode.value))
 
-# сравнение хранящихся в range-tree значений
-def compareRangeTrees(first, second):
-    first_nodes = findAll(first.root)
-    second_nodes = findAll(second.root)
-    if len(first_nodes) != len(second_nodes):
-        return False
-    s_it = iter(second_nodes)
-    for f in first_nodes:
-        s = s_it.__next__()
-        if f.value != s.value:
-            return False
-        f_in_nodes = findAll(f.innerTree.root)
-        s_in_nodes = findAll(s.innerTree.root)
-        if len(f_in_nodes) != len(s_in_nodes):
-            return False
-        s_in_it = iter(s_in_nodes)
-        for f_in in f_in_nodes:
-            s_in = s_in_it.__next__()
-            if f_in.value != s_in.value:
-                return False
-    return True
+# проверка корректности данных, хранимых в range-tree
+def correctRangeTreeContent(tree, points):
+    treePoints = checkRangeTreeContent(tree.root)
+    return comparePointsLists(points, treePoints)
 
-# добавляет в result все ноды из range-tree, упорядоченные по возрастанию value
-def findAll(curNode):
+# возвращает список точек, хранящихся в range-tree
+def checkRangeTreeContent(curNode):
+    if curNode is None:
+        return []
+    if (curNode.leftChild is None) and (curNode.rightChild is None):
+        return checkBinarySearchTreeContent(curNode.innerTree.root)
+    result = []
+    result.extend(checkRangeTreeContent(curNode.leftChild))
+    result.extend(checkRangeTreeContent(curNode.rightChild))
+    return result
+
+# возвращает список точек, хранящихся в binary-search-tree
+def checkBinarySearchTreeContent(curNode):
     if curNode is None:
         return []
     result = []
-    result.extend(findAll(curNode.leftChild))
-    result.append(curNode)
-    result.extend(findAll(curNode.rightChild))
+    result.extend(checkBinarySearchTreeContent(curNode.leftChild))
+    result.append(curNode.point)
+    result.extend(checkBinarySearchTreeContent(curNode.rightChild))
     return result
-

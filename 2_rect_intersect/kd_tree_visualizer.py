@@ -151,7 +151,6 @@ def search_visualize(box, points):
             # ищем медиану точек и делим их на 2 части
             p = np.array(self.points)
             self.mean = np.mean(p[:, self.i])
-            print(self.mean)
             A = list()
             B = list()
             inLeft = True
@@ -159,11 +158,6 @@ def search_visualize(box, points):
                 if (p[self.i] <= self.mean):
                     A.append(p)
                 else:
-                    # if (p[self.i] == self.mean) and inLeft:
-                    #     A.append(p)
-                    #     inLeft = not inLeft
-                    # else:    
-                    #     B.append(p)
                     B.append(p)    
 
             # визуализация разделяющей прямой
