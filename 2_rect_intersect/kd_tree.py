@@ -1,5 +1,4 @@
-import structures
-import copy
+from structures import *
 
 class Node:
     def __init__(self, points):
@@ -27,95 +26,46 @@ def buildKdTree(points):
     if len(points) == 0:
         return KdTree(None, 0, 0, 0, 0)
 
-    points.sort(key=structures.keyX)
-    sortX = copy.deepcopy(points)
-    points.sort(key=structures.keyY)
-    sortY = copy.deepcopy(points)
+    root = buildKdNode(points, False)
 
-    root = buildKdNode(sortX, sortY, False)
-    xMin = sortX[0].x
-    xMax = sortX[len(sortX) - 1].x
-    yMin = sortY[0].y
-    yMax = sortY[len(sortY) - 1].y
+    xMin = min(points, key=keyX).x
+    xMax = max(points, key=keyX).x
+    yMin = min(points, key=keyY).y
+    yMax = max(points, key=keyY).y
+
     return KdTree(root, xMin, yMin, xMax, yMax)
 
 # вспомогательная функция для kd-tree
-def buildKdNode(pSortX, pSortY, depth):
-    if len(pSortX) == 0:
+def buildKdNode(points, depth):
+    if len(points) == 0:
         return None
-    node = Node(pSortX)
-    if len(pSortX) == 1:
+    node = Node(points)
+    if len(points) == 1:
         return node
-    mediana = 0
-    pSortLeftX = []
-    pSortRightX = []
-    pSortLeftY = []
-    pSortRightY = []
+    pointsLeft = []
+    pointsRight = []
     if not depth:
         # четная глубина - делим вертикальной прямой
-        mediana = pSortX[(len(pSortX) - 1) // 2].x
-        inLeft = True
-        equalMedLeftY = set()
-        for p in pSortX:
-            if p.x < mediana:
-                pSortLeftX.append(p)
+        mediana = medianaX(points)
+        for p in points:
+            if p.x <= mediana:
+                pointsLeft.append(p)
             else:
-                if p.x == mediana:
-                    if inLeft:
-                        equalMedLeftY.add(p.y)
-                        pSortLeftX.append(p)
-                    else:
-                        pSortRightX.append(p)
-                    inLeft = not inLeft
-                else:
-                    pSortRightX.append(p)
-
-        for p in pSortY:
-            if p.x < mediana:
-                pSortLeftY.append(p)
-            else:
-                if p.x == mediana:
-                    if p.y in equalMedLeftY:
-                        pSortLeftY.append(p)
-                    else:
-                        pSortRightY.append(p)
-                else:
-                    pSortRightY.append(p)
+                pointsRight.append(p)
     else:
         # нечетная глубина - делим горизонтальной прямой
-        mediana = pSortY[(len(pSortY) - 1) // 2].y
-        inLeft = True
-        equalMedLeftX = set()
-        for p in pSortX:
-            if p.y < mediana:
-                pSortLeftX.append(p)
+        mediana = medianaY(points)
+        for p in points:
+            if p.y <= mediana:
+                pointsLeft.append(p)
             else:
-                if p.y == mediana:
-                    if inLeft:
-                        equalMedLeftX.add(p.x)
-                        pSortLeftX.append(p)
-                    else:
-                        pSortRightX.append(p)
-                    inLeft = not inLeft
-                else:
-                    pSortRightX.append(p)
+                pointsRight.append(p)
 
-        for p in pSortY:
-            if p.y < mediana:
-                pSortLeftY.append(p)
-            else:
-                if p.y == mediana:
-                    if p.x in equalMedLeftX:
-                        pSortLeftY.append(p)
-                    else:
-                        pSortRightY.append(p)
-                else:
-                    pSortRightY.append(p)
     node.setMedian(mediana)
-    if len(pSortLeftX) > 0:
-        node.leftChild = buildKdNode(pSortLeftX, pSortLeftY, not depth)
-    if len(pSortLeftY) > 0:
-        node.rightChild = buildKdNode(pSortRightX, pSortRightY, not depth)
+    if len(pointsLeft) > 0:
+        node.leftChild = buildKdNode(pointsLeft, not depth)
+    if len(pointsRight) > 0:
+        node.rightChild = buildKdNode(pointsRight, not depth)
     return node
 
 
@@ -123,7 +73,7 @@ def buildKdNode(pSortX, pSortY, depth):
 
 # функция, возвращающая лист точек, содержащихся в прямоугольнике rect
 def pointsInRectangle(kdTree, rect):
-    region = structures.Rectangle(kdTree.xMin, kdTree.yMin, kdTree.xMax, kdTree.yMax)
+    region = Rectangle(kdTree.xMin, kdTree.yMin, kdTree.xMax, kdTree.yMax)
     return getPoints(kdTree.root, False, region, rect)
 
 # вспомогательная функция для pointInRectangle
@@ -145,16 +95,16 @@ def getPoints(node, depth, region, rect):
         # хранится вертикальная прямая (медиана по х)
         if (region.yMin > rect.yMax) or (region.yMax < rect.yMin):
             return result
-        if node.med <= rect.xMax:
-            result.extend(getPoints(node.rightChild, not depth, structures.Rectangle(node.med, region.yMin, region.xMax, region.yMax), rect))
+        if node.med < rect.xMax:
+            result.extend(getPoints(node.rightChild, not depth, Rectangle(node.med, region.yMin, region.xMax, region.yMax), rect))
         if node.med >= rect.xMin:
-            result.extend(getPoints(node.leftChild, not depth, structures.Rectangle(region.xMin, region.yMin, node.med, region.yMax), rect))
+            result.extend(getPoints(node.leftChild, not depth, Rectangle(region.xMin, region.yMin, node.med, region.yMax), rect))
     else:
         # хранится горизонтальная прямая (медиана по y)
         if (region.xMin > rect.xMax) or (region.xMax < rect.xMin):
             return result
-        if node.med <= rect.yMax:
-            result.extend(getPoints(node.rightChild, not depth, structures.Rectangle(region.xMin, node.med, region.xMax, region.yMax), rect))
+        if node.med < rect.yMax:
+            result.extend(getPoints(node.rightChild, not depth, Rectangle(region.xMin, node.med, region.xMax, region.yMax), rect))
         if node.med >= rect.yMin:
-            result.extend(getPoints(node.leftChild, not depth, structures.Rectangle(region.xMin, region.yMin, region.xMax, node.med), rect))
+            result.extend(getPoints(node.leftChild, not depth, Rectangle(region.xMin, region.yMin, region.xMax, node.med), rect))
     return result
