@@ -86,12 +86,12 @@ def correctRangeTreeStructure(tree):
     return checkRangeTreeStructure(tree.root)
 
 # вспомогательная рекурсивная функция для проверки структуры range-tree
-def checkRangeTreeStructure(curNode):
-    if curNode is None:
+def checkRangeTreeStructure(node):
+    if node is None:
         return True
-    if not (checkRangeTreeStructure(curNode.leftChild) and checkRangeTreeStructure(curNode.rightChild)):
+    if not (checkRangeTreeStructure(node.leftChild) and checkRangeTreeStructure(node.rightChild)):
         return False
-    return ((curNode.leftChild is None) or (curNode.leftChild.value <= curNode.value)) and ((curNode.rightChild is None) or (curNode.rightChild.value > curNode.value))
+    return ((node.leftChild is None) or (node.leftChild.value <= node.value)) and ((node.rightChild is None) or (node.rightChild.value > node.value))
 
 # проверка корректности данных, хранимых в range-tree
 def correctRangeTreeContent(tree, points):
@@ -99,22 +99,28 @@ def correctRangeTreeContent(tree, points):
     return comparePointsLists(points, treePoints)
 
 # возвращает список точек, хранящихся в range-tree
-def checkRangeTreeContent(curNode):
-    if curNode is None:
+def checkRangeTreeContent(node):
+    if node is None:
         return []
-    if (curNode.leftChild is None) and (curNode.rightChild is None):
-        return checkBinarySearchTreeContent(curNode.innerTree.root)
+    if (node.leftChild is None) and (node.rightChild is None):
+        return checkBinarySearchTreeContent(node.innerTree.root, node.innerTree.points)
     result = []
-    result.extend(checkRangeTreeContent(curNode.leftChild))
-    result.extend(checkRangeTreeContent(curNode.rightChild))
+    result.extend(checkRangeTreeContent(node.leftChild))
+    result.extend(checkRangeTreeContent(node.rightChild))
     return result
 
 # возвращает список точек, хранящихся в binary-search-tree
-def checkBinarySearchTreeContent(curNode):
-    if curNode is None:
+def checkBinarySearchTreeContent(node, points):
+    if node is None:
         return []
     result = []
-    result.extend(checkBinarySearchTreeContent(curNode.leftChild))
-    result.append(curNode.point)
-    result.extend(checkBinarySearchTreeContent(curNode.rightChild))
+    if (node.leftChild is None) and (node.rightChild is None):
+        i = node.index
+        border = node.index + node.length
+        while i < border:
+            result.append(points[i])
+            i += 1
+        return result
+    result.extend(checkBinarySearchTreeContent(node.leftChild, points))
+    result.extend(checkBinarySearchTreeContent(node.rightChild, points))
     return result
