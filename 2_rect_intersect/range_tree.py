@@ -64,21 +64,8 @@ def buildBinarySearchTreeNode(index, length, points):
     if (len(points) == 0):
         return None
     mediana = points[index + (length - 1) // 2].y
-    lengthLeft = 0
-    lengthRight = 0
-    i = index
-    border = index + length
-    inLeft = True
-    while i < border:
-        if points[i].y < mediana:
-            lengthLeft += 1
-        else:
-            if (points[i].y == mediana) and inLeft:
-                lengthLeft += 1
-                inLeft = not inLeft
-            else:
-                lengthRight += 1
-        i += 1
+    lengthLeft = length // 2
+    lengthRight = length - lengthLeft
     node = BSTNode(mediana, index, length)
     if (lengthLeft == 0) or (lengthRight == 0):
         return node
