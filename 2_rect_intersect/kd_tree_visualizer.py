@@ -99,7 +99,7 @@ def intersect(a, b):
 
 
 def searchVisualize(box, points):
-    fig1 = plt.figure(figsize=(6, 6), num=' ')
+    fig1 = plt.figure(figsize=(6, 6), num='  ')
     ax1 = plt.subplot(111, aspect='equal')
     p = np.array(points)
     ax1.plot(p[:, 0], p[:, 1], 'o', color='red')
