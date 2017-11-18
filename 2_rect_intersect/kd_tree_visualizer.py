@@ -81,7 +81,6 @@ def build_visualize(points):
         ax.plot(points.points[:, 0], points.points[:, 1], 'o', color='red')
         ax.set_xlim(0, 20)
         ax.set_ylim(0, 20)
-        display(fig)
     
     display(interactive(changeStep, step=(0, steps)))
 
