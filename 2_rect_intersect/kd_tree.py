@@ -1,14 +1,17 @@
 from structures import *
 
 class Node:
-    def __init__(self, points):
+    def __init__(self):
         self.leftChild = None
         self.rightChild = None
-        self.points = points
+        self.point = None
         self.med = 0
 
     def setMedian(self, med):
         self.med = med
+
+    def setPoint(self, point):
+        self.point = point
 
 class KdTree:
     def __init__(self, root, xMin, yMin, xMax, yMax):
@@ -39,8 +42,9 @@ def buildKdTree(points):
 def buildKdNode(points, depth):
     if len(points) == 0:
         return None
-    node = Node(points)
+    node = Node()
     if len(points) == 1:
+        node.setPoint(points[0])
         return node
     pointsLeft = []
     pointsRight = []
@@ -83,12 +87,12 @@ def getPoints(node, depth, region, rect):
     result = []
 
     if (node.leftChild is None) and (node.rightChild is None):
-        if (rect.xMin <= node.points[0].x) and (rect.xMax >= node.points[0].x) and (rect.yMin <= node.points[0].y) and (rect.yMax >= node.points[0].y):
-            result.extend(node.points)
+        if (rect.xMin <= node.point.x) and (rect.xMax >= node.point.x) and (rect.yMin <= node.point.y) and (rect.yMax >= node.point.y):
+            result.append(node.point)
         return result
 
     if rect.include(region):
-        result.extend(node.points)
+        result.extend(getSubtreePoints(node))
         return result
 
     if not depth:
@@ -107,4 +111,17 @@ def getPoints(node, depth, region, rect):
             result.extend(getPoints(node.rightChild, not depth, Rectangle(region.xMin, node.med, region.xMax, region.yMax), rect))
         if node.med >= rect.yMin:
             result.extend(getPoints(node.leftChild, not depth, Rectangle(region.xMin, region.yMin, region.xMax, node.med), rect))
+    return result
+
+# функция, возвращающая список точек, хранящихся в листах поддерева ноды
+def getSubtreePoints(node):
+    if node is None:
+        return []
+    if (node.leftChild is None) and (node.rightChild is None):
+        return [node.point]
+    result = []
+    if not (node.leftChild is None):
+        result.extend(getSubtreePoints(node.leftChild))
+    if not (node.rightChild is None):
+        result.extend(getSubtreePoints(node.rightChild))
     return result

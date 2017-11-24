@@ -37,15 +37,14 @@ def checkKdTreeStructure(node, depth, grand, parent, haveLeftGrand, haveLeftPare
     if node is None:
         return True
     if (node.leftChild is None) and (node.leftChild is None):
-        for p in node.points:
-            pVal = p.x
-            gVal = p.y
-            if depth % 2 == 0:
-                pVal, gVal = gVal, pVal
-            if (haveLeftParent and (pVal < parent)) or ((not haveLeftParent) and (pVal > parent)):
-                return False
-            if (haveLeftGrand and (gVal < grand)) or ((not haveLeftGrand) and (gVal > grand)):
-                return False
+        pVal = node.point.x
+        gVal = node.point.y
+        if depth % 2 == 0:
+            pVal, gVal = gVal, pVal
+        if (haveLeftParent and (pVal < parent)) or ((not haveLeftParent) and (pVal > parent)):
+            return False
+        if (haveLeftGrand and (gVal < grand)) or ((not haveLeftGrand) and (gVal > grand)):
+            return False
         return True
     if depth > 1:
         if haveLeftGrand and (node.med < grand):
@@ -70,7 +69,7 @@ def checkKdTreeContent(node):
     if node is None:
         return []
     if (node.leftChild is None) and (node.rightChild is None):
-        return node.points
+        return [node.point]
     result = []
     if not (node.leftChild is None):
         result.extend(checkKdTreeContent(node.leftChild))
