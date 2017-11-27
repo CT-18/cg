@@ -123,11 +123,6 @@ def getPointsFromNode(node, points):
     result = []
     i = node.index
     border = node.index + node.length
-    while i < border:
+    for i in range(node.index, border):
         result.append(points[i])
-        i += 1
     return result
-
-
-
-

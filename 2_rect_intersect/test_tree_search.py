@@ -5,56 +5,22 @@ from structures import *
 
 # тестирование выполнения запроса в kd-tree
 def testKdTreePointsInRect(testFunction):
-    tests = 10
-    while tests > 0:
-        tests -= 1
-        testPoints = generator.generateTestPoints()
-        kdTree = kd_tree.buildKdTree(testPoints)
-        rects = 10
-        while rects > 0:
-            rects -= 1
-            testRect = generator.generateTestRect()
-            result = testFunction(kdTree, testRect)
-            expectedResult = kd_tree.pointsInRectangle(kdTree, testRect)
-            if not comparePointsLists(expectedResult, result):
-                print("\n------------------------- FAIL -------------------------\n")
-                return
-    print("\n------------------------- OK -------------------------\n")
+    testPointsInRect(kd_tree.buildKdTree, kd_tree.pointsInRectangle, testFunction)
 
 # тестирование выполнения запроса в range-tree
 def testRangeTreePointsInRect(testFunction):
-    tests = 10
-    while tests > 0:
-        tests -= 1
+    testPointsInRect(range_tree.buildRangeTree, range_tree.pointsInRectangle, testFunction)
+
+# вспомогательная функция для тестирования выполнения запроса в деревьях
+def testPointsInRect(buildFunction, searchFunction, testFunction):
+    for tests in range(0, 10):
         testPoints = generator.generateTestPoints()
-        rangeTree = range_tree.buildRangeTree(testPoints)
-        rects = 10
-        while rects > 0:
-            rects -= 1
+        tree = buildFunction(testPoints)
+        for rects in range(0, 10):
             testRect = generator.generateTestRect()
-            result = testFunction(rangeTree, testRect)
-            expectedResult = range_tree.pointsInRectangle(rangeTree, testRect)
+            result = testFunction(tree, testRect)
+            expectedResult = searchFunction(tree, testRect)
             if not comparePointsLists(expectedResult, result):
                 print("\n------------------------- FAIL -------------------------\n")
                 return
     print("\n------------------------- OK -------------------------\n")
-
-# тестирование данных реализаций range-tree и kd-tree
-def testPointsInRect():
-    tests = 10
-    while tests > 0:
-        tests -= 1
-        testPoints = generator.generateTestPoints()
-        kdTree = kd_tree.buildKdTree(testPoints)
-        rangeTree = range_tree.buildRangeTree(testPoints)
-        rects = 10
-        while rects > 0:
-            rects -= 1
-            testRect = generator.generateTestRect()
-            kdTreeResult = kd_tree.pointsInRectangle(kdTree, testRect)
-            rangeTreeResult = range_tree.pointsInRectangle(rangeTree, testRect)
-            if not comparePointsLists(kdTreeResult, rangeTreeResult):
-                print("\n------------------------- FAIL -------------------------\n")
-                return
-    print("\n------------------------- OK -------------------------\n")
-

@@ -3,24 +3,18 @@ from structures import *
 
 # тестирование построения kd-tree
 def testBuildKdTree(testFunction):
-    tests = 100
-    while tests > 0:
-        tests -= 1
-        points = generator.generateTestPoints()
-        result = testFunction(points)
-        if (not correctKdTreeStructure(result)) or (not correctKdTreeContent(result, points)):
-            print("\n------------------------- FAIL -------------------------\n")
-            return
-    print("\n------------------------- OK -------------------------\n")
+    testBuildTree(testFunction, correctKdTreeStructure, correctKdTreeContent)
 
 # тестирование построения range-tree
 def testBuildRangeTree(testFunction):
-    tests = 100
-    while (tests > 0):
-        tests -= 1
+    testBuildTree(testFunction, correctRangeTreeStructure, correctRangeTreeContent)
+
+# вспомогательная функция для тестирования построения деревьев
+def testBuildTree(testFunction, correctTreeStructure, correctTreeContent):
+    for tests in range(0, 100):
         points = generator.generateTestPoints()
         result = testFunction(points)
-        if (not correctRangeTreeStructure(result)) or (not correctRangeTreeContent(result, points)):
+        if (not correctTreeStructure(result)) or (not correctTreeContent(result, points)):
             print("\n------------------------- FAIL -------------------------\n")
             return
     print("\n------------------------- OK -------------------------\n")
