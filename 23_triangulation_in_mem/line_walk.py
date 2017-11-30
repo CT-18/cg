@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Point, Line, Segment, Ray, intersection
 
+#-------------------NodeWithNeighbours-------------------------------------------#
 def line_walk_node_with_neighbours(tri_node_with_neighbours, a, v1, v2, b, edges):  
     b, ray = inf_ray(a, b, 1000)
     e = Segment(v1, v2)
@@ -78,6 +79,8 @@ def line_walk_node_with_neighbours_e(tri_node_with_neighbours, v1, v2, ray, b, e
         return line_walk_node_with_neighbours_e(tri_node_with_neighbours, v2, tri_node_with_neighbours[v3[0]], Ray(inter2[0], b), b, edges + [e2])
     return edges
 
+
+#-------------------NodesAndTriangles------------------------------------------#
 def line_walk_nodes_and_triangles(tri_nodes_and_triangles, a, v1, v2, b, edges):  
     b, ray = inf_ray(a, b, 1000)
     e = Segment(v1, v2)
@@ -165,6 +168,7 @@ def line_walk_nodes_and_triangles_e(tri_nodes_and_triangles, v1, v2, ray, b, edg
         return line_walk_nodes_and_triangles_e(tri_nodes_and_triangles, v2, tri_nodes_and_triangles[0][v3[0]], Ray(inter2[0], b), b, edges + [e2])
     return edges
 
+#-------------------NodesAndEdgesAndTriangles------------------------------------------------------#
 def line_walk_nodes_and_edges_and_triangles(tri_nodes_and_edges_and_triangles, a, v1, v2, b, edges):
     b, ray = inf_ray(a, b, 1000)
     e = Segment(v1, v2)
@@ -259,5 +263,106 @@ def line_walk_nodes_and_edges_and_triangles_e(tri_nodes_and_edges_and_triangles,
         if (inter2 != []):
             return line_walk_nodes_and_edges_and_triangles_e(tri_nodes_and_edges_and_triangles, v2, v2_n, Ray(inter2[0], b), b, edges + [e2])    
     return edges
+
+#-------------------DoubleEdges----------------------------------#
+def line_walk_double_edges(tri_double_edges, a, v1, v2, b, edges):
+    b, ray = inf_ray(a, b, 1000)
+    e = Segment(v1, v2)
+    if (is_vertex_of_segment(a, e)):
+        node_a = None
+        for idr, node in tri_double_edges[0].items():
+            if (node.p.equals(a)):
+                node_a = node       
+                break
+        return line_walk_double_edges_v(tri_double_edges, node_a, ray, b, edges)
+    else:
+        l_he = [] 
+        for idr, c_he in tri_double_edges[1].items():
+            if ((tri_double_edges[0][c_he.node].p.equals(v1) and \
+                tri_double_edges[0][tri_double_edges[1][c_he.nxt].node].p.equals(v2)) or \
+               (tri_double_edges[0][c_he.node].p.equals(v2) and \
+                tri_double_edges[0][tri_double_edges[1][c_he.nxt].node].p.equals(v1))):
+                l_he.append(c_he)
+        if (len(l_he) == 2):
+            nxt = tri_double_edges[1][l_he[0].nxt]
+            prev = tri_double_edges[1][l_he[0].prev]
+            v1 = tri_double_edges[0][l_he[0].node].p
+            v2 = tri_double_edges[0][nxt.node].p
+            v3 = tri_double_edges[0][prev.node].p
+            fi = intersection(Segment(v1, v2), ray)
+            si = intersection(Segment(v2, v3), ray)
+            ti = intersection(Segment(v3, v1), ray)
+            if ((fi != [] and is_segment(fi[0])) or si != [] or ti != []):
+                return line_walk_double_edges_e(tri_double_edges, l_he[0], ray, b, edges + [e])
+            else:
+                return line_walk_double_edges_e(tri_double_edges, l_he[1], ray, b, edges + [e])
+        else:
+            return line_walk_double_edges_e(tri_double_edges, l_he[0], ray, b, edges + [e])
+
+def line_walk_double_edges_e(tri_double_edges, he, ray, b, edges):
+    nxt = tri_double_edges[1][he.nxt]
+    prev = tri_double_edges[1][he.prev]
+    v1 = tri_double_edges[0][he.node]
+    v2 = tri_double_edges[0][nxt.node]
+    v3 = tri_double_edges[0][prev.node]
+    s = Segment(v1.p, v2.p) 
+    inter = intersection(s, ray) 
+    if (inter != [] and is_segment(inter[0])):
+        p = v1
+        if (ray.contains(v2.p)):
+            p = v2
+        return line_walk_double_edges_v(tri_double_edges, p, Ray(p.p, b), b, edges)
+    e1 = Segment(v1.p, v3.p)
+    e2 = Segment(v3.p, v2.p)
+    inter1 = intersection(e1, ray)
+    inter2 = intersection(e2, ray)
+    if (inter1 != [] and inter2 != []):
+        node_a = None
+        for idr, node in tri_double_edges[0].items():
+            if (node.p.equals(inter1[0])):
+                node_a = node
+                break        
+        return line_walk_double_edges_v(tri_double_edges, node_a, Ray(inter1[0], b), b, edges)
+    if (inter1 != []):
+        edges.append(e1)
+        if (prev.twin != 0):
+            return line_walk_double_edges_e(tri_double_edges, tri_double_edges[1][prev.twin], Ray(inter1[0], b), b, edges)
+    if (inter2 != []):
+        edges.append(e2)
+        if (nxt.twin != 0):
+            return line_walk_double_edges_e(tri_double_edges, tri_double_edges[1][nxt.twin], Ray(inter2[0], b), b, edges)
+    return edges
+
+def line_walk_double_edges_v(tri_double_edges, node_a, ray, b, edges):
+    he = tri_double_edges[1][node_a.he]
+    c_he = he
+    while True:
+        he_prev = tri_double_edges[1][c_he.prev]
+        he_nxt = tri_double_edges[1][c_he.nxt]
+        v1 = tri_double_edges[0][c_he.node]
+        v2 = tri_double_edges[0][he_nxt.node]
+        v3 = tri_double_edges[0][he_prev.node]
+        s = Segment(v1.p, v2.p) 
+        inter = intersection(s, ray)
+        if (inter != [] and is_segment(inter[0])):
+            return line_walk_double_edges_v(tri_double_edges, v2, Ray(v2.p, b), b, edges + [s])
+        s = Segment(v1.p, v3.p) 
+        inter = intersection(s, ray)
+        if (inter != [] and is_segment(inter[0])):
+            return line_walk_double_edges_v(tri_double_edges, v3, Ray(v3.p, b), b, edges + [s])
+        s = Segment(v3.p, v2.p) 
+        inter = intersection(s, ray)
+        if (inter != []):
+            edges.append(s)
+            if (he_nxt.twin != 0):
+                return line_walk_double_edges_e(tri_double_edges, tri_double_edges[1][he_nxt.twin], Ray(inter[0], b), b, edges)
+            else:
+                return edges
+        if (he_prev.twin != 0):
+            c_he = tri_double_edges[1][he_prev.twin]
+        else:
+            return edges
+        if c_he.idr == he.idr:
+            return edges
 
 
