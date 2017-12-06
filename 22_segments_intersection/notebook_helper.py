@@ -11,6 +11,8 @@ def intro():
 
 
 def show_configuration(plt, segments, intersections_student):
+    plt.xlabel('x-coordinate')
+    plt.ylabel('y-coordinate')
     plt.xlim([-10, 10])
     plt.ylim([-10, 10])
     plotlib_utils.draw_segment(plt, segments)
@@ -18,7 +20,7 @@ def show_configuration(plt, segments, intersections_student):
     plt.show()
 
 
-def silly_algorithm_testing(algorithm):
+def silly_algorithm_testing(algorithm, logging=True):
     tests = 1000
     for i in range(tests):
         n = 10
@@ -26,12 +28,13 @@ def silly_algorithm_testing(algorithm):
         intersections_correct = bentley_ottman_helper.segments_intersection_n2(segments)
         intersections_student = algorithm(segments)
         if sorted(intersections_student) != sorted(intersections_correct):
+            
             print("Some intersections not found\n")
             print("correct: ", intersections_correct)
             print("output: ", intersections_student)
             show_configuration(plt, segments, intersections_student)
             return
-        if (i + 1) % 100 == 0:
+        if logging and (i + 1) % 100 == 0:
             print(i + 1, " tests done")
 
         if i == tests - 1:
@@ -82,7 +85,11 @@ def intersection_checking_testing(do_intersect):
     print("Correct solution")
 
 
-def show_events_handle_order():
+def show_events_handle_order(logging = True):
+    plt.xlabel('x-coordinate')
+    plt.ylabel('y-coordinate')
+    plt.title('Events type demonstration')
+
     segments = test_utils.generate_segments(10, 10)
     intersection = bentley_ottman_helper.segments_intersection_n2(segments)
     plotlib_utils.draw_segment(plt, segments)
@@ -90,10 +97,17 @@ def show_events_handle_order():
     plotlib_utils.draw_points(plt, [[segment[1][0], segment[1][1]] for segment in segments], col="ro")
     plotlib_utils.draw_points(plt, intersection, col="go")
 
-    plt.ion()
-    plt.draw()
+    # plt.ion()
+    plt.show()
 
     all_point = sorted([[segment[0][0], segment[0][1]] for segment in segments] + [[segment[1][0], segment[1][1]] for segment in segments] + intersection)
     print("Iteration order")
-    for point in all_point:
+    n = len(all_point)
+    changed = False
+    if not logging and n > 5:
+        n = 5
+        changed = True
+    for point in all_point[:n]:
         print("{%.2f"%(point[0]) + ",", "%.2f}"%(point[1])),
+    if changed:
+        print("...")

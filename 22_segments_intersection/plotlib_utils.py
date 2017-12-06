@@ -21,6 +21,8 @@ def draw(plt):
     max_val = 9
     segments = generate_segments(max_val, 10)
     draw_segment(plt, segments)
+    plt.xlabel('x-coordinate')
+    plt.ylabel('y-coordinate')
     plt.show()
 
 
@@ -33,6 +35,10 @@ def colors(val):
 
 
 def draw_figure(plt, turn, width, step):
+    plt.title('Turn predicate values (turn([0, 0], [1, 1], [x, y])')
+    plt.xlabel('x-coordinate')
+    plt.ylabel('y-coordinate')
+
     plt.axis([-width, width, -width, width])
     x = np.array([-width, -width])
     y = np.array([width, width])
