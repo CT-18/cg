@@ -29,9 +29,10 @@ def line_walk_node_with_neighbours(triang, a, v1, v2, b, edges):
             count = count + 1
 
     if is_vertex_of_segment(a, e):
-        return line_walk_node_with_neighbours_v(node_a, ray, b, [])
+        return line_walk_node_with_neighbours_v(node_a, ray, b, edges)
     else:
-        return line_walk_node_with_neighbours_e(node_v1, node_v2, ray, b, [e])
+        edges.append(e)
+        return line_walk_node_with_neighbours_e(node_v1, node_v2, ray, b, edges)
 
 
 def line_walk_node_with_neighbours_v(node, ray, b, edges):
@@ -39,7 +40,9 @@ def line_walk_node_with_neighbours_v(node, ray, b, edges):
         p = n_node.p
         s = Segment(node.p, p) 
         inter = intersection(s, ray)
-
+        if (inter == None):
+            print(s)
+            print(ray)
         if inter != [] and is_segment(inter[0]):
             edges.append(s)
             return line_walk_node_with_neighbours_v(n_node, Ray(p, b), b, edges)
@@ -388,15 +391,21 @@ def line_walk_double_edges_e(he, ray, b, edges):
 
 
 def line_walk_double_edges_v(node, ray, b, edges):
-    he = node.he
-    c_he = he
-
-    while True:
+    
+    list_of_n_triangles = node.get_neighbor_triangles()
+    
+    for t in list_of_n_triangles:
+        c_he = t.he
+        
+        while(c_he.node != node):
+            c_he = c_he.nxt
+       
         he_prev = c_he.prev
         he_nxt = c_he.nxt
         v1 = c_he.node
         v2 = he_nxt.node
         v3 = he_prev.node
+        
         s = Segment(v1.p, v2.p) 
         inter = intersection(s, ray)
 
@@ -410,6 +419,7 @@ def line_walk_double_edges_v(node, ray, b, edges):
         if inter != [] and is_segment(inter[0]):
             edges.append(s)
             return line_walk_double_edges_v(v3, Ray(v3.p, b), b, edges)
+        
         s = Segment(v3.p, v2.p) 
         inter = intersection(s, ray)
         
@@ -419,11 +429,4 @@ def line_walk_double_edges_v(node, ray, b, edges):
                 return line_walk_double_edges_e(he_nxt.twin, Ray(inter[0], b), b, edges)
             else:
                 return edges
-
-        if he_prev.twin != None:
-            c_he = he_prev.twin
-        else:
-            return edges
-
-        if c_he == he:
-            return edges
+    return edges
