@@ -62,7 +62,7 @@ def line_walk_node_with_neighbours_v(node, ray, b):
 
 
 def line_walk_node_with_neighbours_e(v1, v2, ray, b):
-    s_b = turn(cgPoint(b.x, b.y), cgPoint(v1.p.p1, v1.p.p2), cgPoint(v2.p.p1, v2.p.p2))
+    s_b = turn(cgPoint(int(b.x), int(b.y)), cgPoint(int(v1.p.x), int(v1.p.y)), cgPoint(int(v2.p.x), int(v2.p.y)))
     s = Segment(v1.p, v2.p) 
     inter = intersection(s, ray)
 
@@ -74,7 +74,9 @@ def line_walk_node_with_neighbours_e(v1, v2, ray, b):
         raise StopIteration
 
     vs = list(set(v1.neigh_nodes) & set(v2.neigh_nodes))
-    v3 = [i for i in vs if s_b == turn(cgPoint(i.x, i.y), cgPoint(v1.p.p1, v1.p.p2), cgPoint(v2.p.p1, v2.p.p2))]
+    v3 = [i for i in vs 
+          if s_b == turn(cgPoint(int(i.p.x), int(i.p.y)), cgPoint(int(v1.p.x), int(v1.p.y)), cgPoint(int(v2.p.x), int(v2.p.y)))
+         ]
     
     if v3 == []:
         raise StopIteration
@@ -166,7 +168,7 @@ def line_walk_nodes_and_triangles_v(node, ray, b):
 
 
 def line_walk_nodes_and_triangles_e(v1, v2, ray, b):
-    s_b = turn(cgPoint(b.x, b.y), cgPoint(v1.p.p1, v1.p.p2), cgPoint(v2.p.p1, v2.p.p2))
+    s_b = turn(cgPoint(int(b.x), int(b.y)), cgPoint(int(v1.p.x), int(v1.p.y)), cgPoint(int(v2.p.x), int(v2.p.y)))
     s = Segment(v1.p, v2.p) 
     inter = intersection(s, ray) 
 
@@ -189,7 +191,9 @@ def line_walk_nodes_and_triangles_e(v1, v2, ray, b):
         ts.discard(v2)
         vp = vp + list(ts)
     
-    v3 = [i for i in vp if s_b == turn(cgPoint(i.x, i.y), cgPoint(v1.p.p1, v1.p.p2), cgPoint(v2.p.p1, v2.p.p2))]
+    v3 = [i for i in vp 
+          if s_b == turn(cgPoint(int(i.p.x), int(i.p.y)), cgPoint(int(v1.p.x), int(v1.p.y)), cgPoint(int(v2.p.x), int(v2.p.y)))
+         ]
     
     if v3 == []:
         raise StopIteration
@@ -294,8 +298,8 @@ def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b):
             
         yield from line_walk_nodes_and_edges_and_triangles_v(end_node1, Ray(end_node1.p, b), b)
         raise StopIteration
-
-    s_b = turn(cgPoint(b.x, b.y), cgPoint(v1.p.p1, v1.p.p2), cgPoint(v2.p.p1, v2.p.p2))
+    print(b, v1.p, v2.p)
+    s_b = turn(cgPoint(int(b.x), int(b.y)), cgPoint(int(v1.p.x), int(v1.p.y)), cgPoint(int(v2.p.x), int(v2.p.y)))
     se = None
     
     for index, n_triangle in enumerate(edge.triangles):
@@ -304,7 +308,8 @@ def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b):
         mb_e = list(mb_e)
         o_v = list(set(mb_e[0].nodes) & set(mb_e[1].nodes))[0]
     
-        if s_b != turn(cgPoint(o_v.x, o_v.y), cgPoint(v1.p.p1, v1.p.p2), cgPoint(v2.p.p1, v2.p.p2)):
+        if s_b != turn(cgPoint(int(o_v.p.x), int(o_v.p.y)), cgPoint(int(v1.p.x), int(v1.p.y)),
+                       cgPoint(int(v2.p.x), int(v2.p.y))):
             continue
         
         t_e1 = mb_e[0].nodes
