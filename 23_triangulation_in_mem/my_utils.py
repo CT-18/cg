@@ -1,5 +1,5 @@
 import numpy as np
-from sympy import Point, Ray
+from sympy import Point, Ray, Segment
 import math 
 
 def is_vertex_of_segment(p, v):

@@ -351,7 +351,7 @@ def line_walk_double_edges(triang, a, v1, v2, b):
                 node_a = n       
                 break
 
-        yield from line_walk_double_edges_v(node_a, ray, b, edges)
+        yield from line_walk_double_edges_v(node_a, ray, b)
     else:
         l_he = [] 
 
