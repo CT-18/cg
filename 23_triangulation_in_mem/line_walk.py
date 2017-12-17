@@ -3,11 +3,12 @@ import itertools
 import numpy as np
 import matplotlib.pyplot as plt
 from sympy import Point, Line, Segment, Ray, intersection
-
+from cg.point import Point as cgPoint
+from cg.point import turn
 from my_utils import *
 
 #-------------------NodeWithNeighbours-------------------------------------------#
-def line_walk_node_with_neighbours(triang, a, v1, v2, b, edges):
+def line_walk_node_with_neighbours(triang, a, v1, v2, b):
     b, ray = inf_ray(a, b, 1000)
     e = Segment(v1, v2)
     node_a = None
@@ -29,13 +30,13 @@ def line_walk_node_with_neighbours(triang, a, v1, v2, b, edges):
             count = count + 1
 
     if is_vertex_of_segment(a, e):
-        return line_walk_node_with_neighbours_v(node_a, ray, b, edges)
+        yield from line_walk_node_with_neighbours_v(node_a, ray, b)
     else:
-        edges.append(e)
-        return line_walk_node_with_neighbours_e(node_v1, node_v2, ray, b, edges)
+        yield e
+        yield from line_walk_node_with_neighbours_e(node_v1, node_v2, ray, b)
 
 
-def line_walk_node_with_neighbours_v(node, ray, b, edges):
+def line_walk_node_with_neighbours_v(node, ray, b):
     for n_node in node.neigh_nodes:
         p = n_node.p
         s = Segment(node.p, p) 
@@ -44,8 +45,10 @@ def line_walk_node_with_neighbours_v(node, ray, b, edges):
             print(s)
             print(ray)
         if inter != [] and is_segment(inter[0]):
-            edges.append(s)
-            return line_walk_node_with_neighbours_v(n_node, Ray(p, b), b, edges)
+            yield s
+            yield from line_walk_node_with_neighbours_v(n_node, Ray(p, b), b)
+            raise StopIteration
+            
 
     for i, j in itertools.combinations(node.neigh_nodes, r=2):
         if i in set(j.neigh_nodes):
@@ -53,14 +56,13 @@ def line_walk_node_with_neighbours_v(node, ray, b, edges):
             inter = intersection(s, ray)
             
             if inter != []:
-                edges.append(s)
-                return line_walk_node_with_neighbours_e(i, j, Ray(inter[0], b), b, edges) 
+                yield s
+                yield from line_walk_node_with_neighbours_e(i, j, Ray(inter[0], b), b) 
+                raise StopIteration
 
-    return edges
 
-
-def line_walk_node_with_neighbours_e(v1, v2, ray, b, edges):
-    s_b = turn(b, v1.p, v2.p)
+def line_walk_node_with_neighbours_e(v1, v2, ray, b):
+    s_b = turn(sgPoint(b.p1, b.p2), sgPoint(v1.p.p1, v1.p.p2), sgPoint(v2.p.p1, v2.p.p2))
     s = Segment(v1.p, v2.p) 
     inter = intersection(s, ray)
 
@@ -68,13 +70,14 @@ def line_walk_node_with_neighbours_e(v1, v2, ray, b, edges):
         end_node = v1
         if ray.contains(v2.p):
             end_node = v2
-        return line_walk_node_with_neighbours_v(end_node, Ray(end_node.p, b), b, edges)
+        yield from line_walk_node_with_neighbours_v(end_node, Ray(end_node.p, b), b)
+        raise StopIteration
 
     vs = list(set(v1.neigh_nodes) & set(v2.neigh_nodes))
-    v3 = [i for i in vs if s_b == turn(i.p, v1.p, v2.p)]
+    v3 = [i for i in vs if s_b == turn(sgPoint(i.p1, i.p2), sgPoint(v1.p.p1, v1.p.p2), sgPoint(v2.p.p1, v2.p.p2))]
     
     if v3 == []:
-        return edges
+        raise StopIteration
     
     e1 = Segment(v1.p, v3[0].p)
     e2 = Segment(v2.p, v3[0].p)
@@ -82,19 +85,20 @@ def line_walk_node_with_neighbours_e(v1, v2, ray, b, edges):
     inter2 = intersection(e2, ray)
     
     if inter1 != [] and inter2 != []:
-        return line_walk_node_with_neighbours_v(v3[0], Ray(inter1[0], b), b, edges)
+        yield from line_walk_node_with_neighbours_v(v3[0], Ray(inter1[0], b), b)
+        raise StopIteration
     if inter1 != []:
-        edges.append(e1)
-        return line_walk_node_with_neighbours_e(v1, v3[0], Ray(inter1[0], b), b, edges)
+        yield e1
+        yield from line_walk_node_with_neighbours_e(v1, v3[0], Ray(inter1[0], b), b)
+        raise StopIteration
     if inter2 != []:
-        edges.append(e2)
-        return line_walk_node_with_neighbours_e(v2, v3[0], Ray(inter2[0], b), b, edges)
-    
-    return edges
+        yield e2
+        yield from line_walk_node_with_neighbours_e(v2, v3[0], Ray(inter2[0], b), b)
+        raise StopIteration
 
 
 #-------------------NodesAndTriangles------------------------------------------#
-def line_walk_nodes_and_triangles(triang, a, v1, v2, b, edges):  
+def line_walk_nodes_and_triangles(triang, a, v1, v2, b):  
     b, ray = inf_ray(a, b, 1000)
     e = Segment(v1, v2)
     node_a = None
@@ -116,12 +120,14 @@ def line_walk_nodes_and_triangles(triang, a, v1, v2, b, edges):
             count = count + 1
 
     if is_vertex_of_segment(a, e):
-        return line_walk_nodes_and_triangles_v(node_a, ray, b, [])
+        yield from line_walk_nodes_and_triangles_v(node_a, ray, b)
+        raise StopIteration
     else:
-        return line_walk_nodes_and_triangles_e(node_v1, node_v2, ray, b, [e])
+        yield e
+        yield from line_walk_nodes_and_triangles_e(node_v1, node_v2, ray, b)
     
 
-def line_walk_nodes_and_triangles_v(node, ray, b, edges):
+def line_walk_nodes_and_triangles_v(node, ray, b):
     for n_triangles in node.triangles:
         if n_triangles == None:
             continue 
@@ -135,8 +141,9 @@ def line_walk_nodes_and_triangles_v(node, ray, b, edges):
             inter = intersection(s, ray) 
             
             if inter != [] and is_segment(inter[0]):
-                edges.append(s)
-                return line_walk_nodes_and_triangles_v(n_node, Ray(end_node, b), b, edges)
+                yield s
+                yield from line_walk_nodes_and_triangles_v(n_node, Ray(end_node, b), b)
+                raise StopIteration
 
     for n_triangles in node.triangles:
         if n_triangles == None:
@@ -151,14 +158,15 @@ def line_walk_nodes_and_triangles_v(node, ray, b, edges):
         inter = intersection(s, ray)
 
         if inter != []: 
-            edges.append(s)
-            return line_walk_nodes_and_triangles_e(node_i, node_j, Ray(inter[0], b), b, edges) 
+            yield s
+            yield from line_walk_nodes_and_triangles_e(node_i, node_j, Ray(inter[0], b), b)
+            raise StopIteration
     
-    return edges
+    raise StopIteration
 
 
-def line_walk_nodes_and_triangles_e(v1, v2, ray, b, edges):
-    s_b = turn(b, v1.p, v2.p)
+def line_walk_nodes_and_triangles_e(v1, v2, ray, b):
+    s_b = turn(sgPoint(b.p1, b.p2), sgPoint(v1.p.p1, v1.p.p2), sgPoint(v2.p.p1, v2.p.p2))
     s = Segment(v1.p, v2.p) 
     inter = intersection(s, ray) 
 
@@ -168,7 +176,7 @@ def line_walk_nodes_and_triangles_e(v1, v2, ray, b, edges):
         if ray.contains(v2.p):
             end_node = v2
         
-        return line_walk_nodes_and_triangles_v(end_node, Ray(end_node.p, b), b, edges)
+        yield from line_walk_nodes_and_triangles_v(end_node, Ray(end_node.p, b), b)
 
     tp = set(v1.triangles) & set(v2.triangles)
     tp.discard(None)
@@ -181,10 +189,10 @@ def line_walk_nodes_and_triangles_e(v1, v2, ray, b, edges):
         ts.discard(v2)
         vp = vp + list(ts)
     
-    v3 = [i for i in vp if s_b == turn(i.p, v1.p, v2.p)]
+    v3 = [i for i in vp if s_b == turn(sgPoint(i.p1, i.p2), sgPoint(v1.p.p1, v1.p.p2), sgPoint(v2.p.p1, v2.p.p2))]
     
     if v3 == []:
-        return edges
+        raise StopIteration
 
     e1 = Segment(v1.p, v3[0].p)
     e2 = Segment(v2.p, v3[0].p)
@@ -192,19 +200,22 @@ def line_walk_nodes_and_triangles_e(v1, v2, ray, b, edges):
     inter2 = intersection(e2, ray)
 
     if inter1 != [] and inter2 != []:
-        return line_walk_nodes_and_triangles_v(v3[0], Ray(inter1[0], b), b, edges)
+        yield from line_walk_nodes_and_triangles_v(v3[0], Ray(inter1[0], b), b)
+        raise StopIteration
     if inter1 != []:
-        edges.append(e1)
-        return line_walk_nodes_and_triangles_e(v1, v3[0], Ray(inter1[0], b), b, edges)
+        yield e1
+        yield from line_walk_nodes_and_triangles_e(v1, v3[0], Ray(inter1[0], b), b)
+        raise StopIteration
     if inter2 != []:
-        edges.append(e2)
-        return line_walk_nodes_and_triangles_e(v2, v3[0], Ray(inter2[0], b), b, edges)
+        yield e2
+        yield from line_walk_nodes_and_triangles_e(v2, v3[0], Ray(inter2[0], b), b)
+        raise StopIteration
     
-    return edges
+    raise StopIteration
 
 
 #-------------------NodesAndEdgesAndTriangles------------------------------------------------------#
-def line_walk_nodes_and_edges_and_triangles(triang, a, v1, v2, b, edges):
+def line_walk_nodes_and_edges_and_triangles(triang, a, v1, v2, b):
     b, ray = inf_ray(a, b, 1000)
     e = Segment(v1, v2)
     node_a = None
@@ -226,12 +237,15 @@ def line_walk_nodes_and_edges_and_triangles(triang, a, v1, v2, b, edges):
             count = count + 1
 
     if is_vertex_of_segment(a, e):
-        return line_walk_nodes_and_edges_and_triangles_v(node_a, ray, b, [])
+        yield from line_walk_nodes_and_edges_and_triangles_v(node_a, ray, b)
+        raise StopIteration
     else:
-        return line_walk_nodes_and_edges_and_triangles_e(node_v1, node_v2, ray, b, [e])
+        yield e
+        yield from line_walk_nodes_and_edges_and_triangles_e(node_v1, node_v2, ray, b)
+        raise StopIteration
     
 
-def line_walk_nodes_and_edges_and_triangles_v(node, ray, b, edges):
+def line_walk_nodes_and_edges_and_triangles_v(node, ray, b):
     for n_triangles in node.triangles:
         for n_edge in n_triangles.edges:
             end_node = None
@@ -247,8 +261,9 @@ def line_walk_nodes_and_edges_and_triangles_v(node, ray, b, edges):
             inter = intersection(s, ray) 
 
             if inter != [] and is_segment(inter[0]):
-                edges.append(s)
-                return line_walk_nodes_and_edges_and_triangles_v(end_node, Ray(end_node.p, b), b, edges)
+                yield s
+                yield from line_walk_nodes_and_edges_and_triangles_v(end_node, Ray(end_node.p, b), b)
+                raise StopIteration
 
     for n_triangles in node.triangles:
         for n_edge in n_triangles.edges:
@@ -259,12 +274,13 @@ def line_walk_nodes_and_edges_and_triangles_v(node, ray, b, edges):
                 inter = intersection(s, ray)
                 
                 if inter != []:
-                    edges.append(s)
-                    return line_walk_nodes_and_edges_and_triangles_e(node_i, node_j, Ray(inter[0], b), b, edges) 
-    return edges
+                    yield s
+                    yield from line_walk_nodes_and_edges_and_triangles_e(node_i, node_j, Ray(inter[0], b), b)
+                    raise StopIteration
+    raise StopIteration
 
 
-def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b, edges):
+def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b):
     s = Segment(v1.p, v2.p)
     edge = list(set(v1.edges) & set(v2.edges))[0]
     inter = intersection(s, ray)
@@ -275,9 +291,11 @@ def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b, edges):
 
         if ray.contains(end_node2.p):
             end_node1 = end_node2
-        return line_walk_nodes_and_edges_and_triangles_v(end_node1, Ray(end_node1.p, b), b, edges)
+            
+        yield from line_walk_nodes_and_edges_and_triangles_v(end_node1, Ray(end_node1.p, b), b)
+        raise StopIteration
 
-    s_b = turn(b, v1.p, v2.p)
+    s_b = turn(sgPoint(b.p1, b.p2), sgPoint(v1.p.p1, v1.p.p2), sgPoint(v2.p.p1, v2.p.p2))
     se = None
     
     for index, n_triangle in enumerate(edge.triangles):
@@ -286,7 +304,7 @@ def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b, edges):
         mb_e = list(mb_e)
         o_v = list(set(mb_e[0].nodes) & set(mb_e[1].nodes))[0]
     
-        if s_b != turn(o_v.p, v1.p, v2.p):
+        if s_b != turn(sgPoint(o_v.p1, o_v.p2), sgPoint(v1.p.p1, v1.p.p2), sgPoint(v2.p.p1, v2.p.p2)):
             continue
         
         t_e1 = mb_e[0].nodes
@@ -301,19 +319,22 @@ def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b, edges):
         inter2 = intersection(e2, ray)
         
         if inter1 != [] and inter2 != []:      
-            return line_walk_nodes_and_edges_and_triangles_v(o_v, Ray(inter1[0], b), b, edges)
+            yield from line_walk_nodes_and_edges_and_triangles_v(o_v, Ray(inter1[0], b), b)
+            raise StopIteration
         if inter1 != []:
-            edges.append(e1)
-            return line_walk_nodes_and_edges_and_triangles_e(v1, v1_n, Ray(inter1[0], b), b, edges)
+            yield e1
+            yield from line_walk_nodes_and_edges_and_triangles_e(v1, v1_n, Ray(inter1[0], b), b)
+            raise StopIteration
         if inter2 != []:
-            edges.append(e2)
-            return line_walk_nodes_and_edges_and_triangles_e(v2, v2_n, Ray(inter2[0], b), b, edges)    
+            yield e2
+            yield from line_walk_nodes_and_edges_and_triangles_e(v2, v2_n, Ray(inter2[0], b), b)
+            raise StopIteration
     
-    return edges
+    raise StopIteration
 
 
 #-------------------DoubleEdges----------------------------------#
-def line_walk_double_edges(triang, a, v1, v2, b, edges):
+def line_walk_double_edges(triang, a, v1, v2, b):
     b, ray = inf_ray(a, b, 1000)
     e = Segment(v1, v2)
 
@@ -325,7 +346,7 @@ def line_walk_double_edges(triang, a, v1, v2, b, edges):
                 node_a = n       
                 break
 
-        return line_walk_double_edges_v(node_a, ray, b, edges)
+        yield from line_walk_double_edges_v(node_a, ray, b, edges)
     else:
         l_he = [] 
 
@@ -347,17 +368,17 @@ def line_walk_double_edges(triang, a, v1, v2, b, edges):
             ti = intersection(Segment(v3, v1), ray)
             
             if (fi != [] and is_segment(fi[0])) or si != [] or ti != []:
-                edges.append(e)
-                return line_walk_double_edges_e(l_he[0], ray, b, edges)
+                yield e
+                yield from line_walk_double_edges_e(l_he[0], ray, b)
             else:
-                edges.append(e)
-                return line_walk_double_edges_e(l_he[1], ray, b, edges)
+                yield e
+                yield from line_walk_double_edges_e(l_he[1], ray, b)
         else:
-            edges.append(e)
-            return line_walk_double_edges_e(l_he[0], ray, b, edges)
+            yield e
+            yield from line_walk_double_edges_e(l_he[0], ray, b)
 
 
-def line_walk_double_edges_e(he, ray, b, edges):
+def line_walk_double_edges_e(he, ray, b):
     nxt = he.nxt
     prev = he.prev
     v1 = he.node
@@ -370,7 +391,8 @@ def line_walk_double_edges_e(he, ray, b, edges):
         end_node = v1
         if ray.contains(v2.p):
             end_node = v2
-        return line_walk_double_edges_v(end_node, Ray(end_node.p, b), b, edges)
+        yield from line_walk_double_edges_v(end_node, Ray(end_node.p, b), b)
+        raise StopIteration
 
     e1 = Segment(v1.p, v3.p)
     e2 = Segment(v3.p, v2.p)
@@ -378,19 +400,22 @@ def line_walk_double_edges_e(he, ray, b, edges):
     inter2 = intersection(e2, ray)
 
     if inter1 != [] and inter2 != []:       
-        return line_walk_double_edges_v(v3, Ray(inter1[0], b), b, edges)
+        yield from line_walk_double_edges_v(v3, Ray(inter1[0], b), b)
+        raise StopIteration
     if inter1 != []:
-        edges.append(e1)
+        yield e1
         if (prev.twin != None):
-            return line_walk_double_edges_e(prev.twin, Ray(inter1[0], b), b, edges)
+            yield from line_walk_double_edges_e(prev.twin, Ray(inter1[0], b), b)
+            raise StopIteration
     if inter2 != []:
-        edges.append(e2)
+        yield e2
         if (nxt.twin != None):
-            return line_walk_double_edges_e(nxt.twin, Ray(inter2[0], b), b, edges)
-    return edges
+            yield from line_walk_double_edges_e(nxt.twin, Ray(inter2[0], b), b)
+            raise StopIteration
+    raise StopIteration
 
 
-def line_walk_double_edges_v(node, ray, b, edges):
+def line_walk_double_edges_v(node, ray, b):
     
     list_of_n_triangles = node.get_neighbor_triangles()
     
@@ -410,23 +435,26 @@ def line_walk_double_edges_v(node, ray, b, edges):
         inter = intersection(s, ray)
 
         if inter != [] and is_segment(inter[0]):
-            edges.append(s)
-            return line_walk_double_edges_v(v2, Ray(v2.p, b), b, edges)
+            yield s
+            yield from line_walk_double_edges_v(v2, Ray(v2.p, b), b)
+            raise StopIteration
 
         s = Segment(v1.p, v3.p) 
         inter = intersection(s, ray)
         
         if inter != [] and is_segment(inter[0]):
-            edges.append(s)
-            return line_walk_double_edges_v(v3, Ray(v3.p, b), b, edges)
+            yield s
+            yield from line_walk_double_edges_v(v3, Ray(v3.p, b), b)
+            raise StopIteration
         
         s = Segment(v3.p, v2.p) 
         inter = intersection(s, ray)
         
         if inter != []:
-            edges.append(s)
+            yield s
             if he_nxt.twin != None:
-                return line_walk_double_edges_e(he_nxt.twin, Ray(inter[0], b), b, edges)
+                yield from line_walk_double_edges_e(he_nxt.twin, Ray(inter[0], b), b)
+                raise StopIteration
             else:
-                return edges
-    return edges
+                raise StopIteration
+    raise StopIteration
