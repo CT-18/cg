@@ -42,8 +42,6 @@ def line_walk_node_with_neighbours_v(node, ray, b):
         s = Segment(node.p, p) 
         inter = intersection(s, ray)
         if (inter == None):
-            print(s)
-            print(ray)
         if inter != [] and is_segment(inter[0]):
             yield s
             yield from line_walk_node_with_neighbours_v(n_node, Ray(p, b), b)
@@ -298,7 +296,6 @@ def line_walk_nodes_and_edges_and_triangles_e(v1, v2, ray, b):
             
         yield from line_walk_nodes_and_edges_and_triangles_v(end_node1, Ray(end_node1.p, b), b)
         raise StopIteration
-    print(b, v1.p, v2.p)
     s_b = turn(cgPoint(int(b.x), int(b.y)), cgPoint(int(v1.p.x), int(v1.p.y)), cgPoint(int(v2.p.x), int(v2.p.y)))
     se = None
     
