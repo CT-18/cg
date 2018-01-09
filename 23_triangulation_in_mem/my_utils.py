@@ -1,5 +1,5 @@
 import numpy as np
-from sympy import Point, Ray, Segment
+from sympy import Point, Ray, Segment, Line
 import math 
 
 def is_vertex_of_segment(p, v):
@@ -35,5 +35,5 @@ def inf_ray(a, b, mult):
             b = Point(b.x + mult * step_x, b.y + mult * step_y)
         else:
             b = Point(b.x - mult * step_x, b.y - mult * step_y)
-            
-    return (b, Ray(a, b))
+    
+    return (b, Ray(a, b)) 

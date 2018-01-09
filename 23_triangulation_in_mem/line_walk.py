@@ -7,6 +7,7 @@ from cg.point import Point as cgPoint
 from cg.point import turn
 from my_utils import *
 
+
 #-------------------NodeWithNeighbours-------------------------------------------#
 def line_walk_node_with_neighbours(triang, a, v1, v2, b):
     b, ray = inf_ray(a, b, 1000)
@@ -28,7 +29,7 @@ def line_walk_node_with_neighbours(triang, a, v1, v2, b):
         if node.p.equals(v2):
             node_v2 = node
             count = count + 1
-
+        
     if is_vertex_of_segment(a, e):
         yield from line_walk_node_with_neighbours_v(node_a, ray, b)
     else:
@@ -41,11 +42,11 @@ def line_walk_node_with_neighbours_v(node, ray, b):
         p = n_node.p
         s = Segment(node.p, p) 
         inter = intersection(s, ray)
-        if (inter == None):
-            if inter != [] and is_segment(inter[0]):
-                yield s
-                yield from line_walk_node_with_neighbours_v(n_node, Ray(p, b), b)
-                raise StopIteration
+        
+        if inter != [] and is_segment(inter[0]):
+            yield s
+            yield from line_walk_node_with_neighbours_v(n_node, Ray(p, b), b)
+            raise StopIteration
             
 
     for i, j in itertools.combinations(node.neigh_nodes, r=2):
