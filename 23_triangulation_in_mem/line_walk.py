@@ -42,10 +42,10 @@ def line_walk_node_with_neighbours_v(node, ray, b):
         s = Segment(node.p, p) 
         inter = intersection(s, ray)
         if (inter == None):
-        if inter != [] and is_segment(inter[0]):
-            yield s
-            yield from line_walk_node_with_neighbours_v(n_node, Ray(p, b), b)
-            raise StopIteration
+            if inter != [] and is_segment(inter[0]):
+                yield s
+                yield from line_walk_node_with_neighbours_v(n_node, Ray(p, b), b)
+                raise StopIteration
             
 
     for i, j in itertools.combinations(node.neigh_nodes, r=2):
