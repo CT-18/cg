@@ -1,0 +1,7 @@
+numpy
+sympy
+shapely
+matplotlib
+ipython
+ipython-genutils
+descartes
