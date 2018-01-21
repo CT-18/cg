@@ -22,14 +22,8 @@ class Hedge:
         
     def __repr__(self):
         return '{}->{}'.format(self.origin, self.twin.origin)
-    
-def append_shorthands(points):
-    for p in points:
-        p.x = p.coord[0]
-        p.y = p.coord[1]
 
 def build_dcel(vert):
-    append_shorthands(vert)
     dcel = []
     start = Hedge(vert[0])
     start.twin = Hedge(vert[1])
