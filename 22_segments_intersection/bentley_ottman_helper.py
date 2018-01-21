@@ -73,4 +73,4 @@ def segments_intersection_set(f, s):
     if result is None:
         return [max_np_array(min_np_array(f[0], f[1]), min_np_array(s[0], s[1])),
                 min_np_array(max_np_array(f[0], f[1]), max_np_array(s[0], s[1]))]
-    return [result, result]
+    return result
