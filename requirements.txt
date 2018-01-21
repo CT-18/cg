@@ -1,0 +1,13 @@
+git+https://github.com/CT-18/cg_common
+jupyter
+numpy
+scipy
+sympy==1.0
+shapely
+matplotlib
+ipywidgets
+ipython
+ipython-genutils
+descartes
+graphviz
+sortedcontainers
